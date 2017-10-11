@@ -1,0 +1,15 @@
+@startuml
+scale 450 width
+title Order state machine
+
+[*] --> Created
+Created -> Paid : notify paid
+Created --> Cancelled : cancel order
+Cancelled --> [*]
+Paid -> InDelivery : articleShipped
+InDelivery --> Received : sign for
+Received --> Confirmed : confirm order
+Confirmed --> [*]
+
+center footer Generated for demonstration
+@enduml

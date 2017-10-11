@@ -1,0 +1,10 @@
+instance:
+  name: "[i2]"
+
+server:
+  port: 18082
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: shipping-service
+  cloud:
+    config:
+      uri: http://dmall-config-server:8888
