@@ -67,7 +67,14 @@ public class OrderController {
 
 
   @RequestMapping(value = "/orders/{oid}/confirm", method = RequestMethod.POST, headers = "Accept=application/json")
-  public void confirm(@PathVariable("oid") Integer oid, String shipping_id, String shipments_time) {
+  public void confirm(@PathVariable("oid") Integer oid, String uid) {
+
+  }
+
+  @RequestMapping(value = "/orders/{oid}/cancel", method = RequestMethod.POST, headers = "Accept=application/json")
+  public void cancel(@PathVariable("oid") Integer oid, String uid, String reason) {
 
   }
 }
+
+
