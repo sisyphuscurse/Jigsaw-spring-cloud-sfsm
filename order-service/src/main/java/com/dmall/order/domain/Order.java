@@ -1,66 +1,59 @@
 
 package com.dmall.order.domain;
 
+
+import com.dmall.order.infrastructure.broker.Product;
+import com.dmall.order.infrastructure.broker.Shipping;
+import com.dmall.order.interfaces.dto.OrderRequest;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.statemachine.annotation.OnTransition;
+import org.springframework.statemachine.annotation.WithStateMachine;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@WithStateMachine
+@Getter
+@Setter
+@Builder
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
 public class Order {
 
-  private String orderId;
+  private Integer oid;
+  private Integer uid;
+  private BigDecimal total;
+  private List<OrderItem> items;
+  private String create_time;
+  private String status;
 
-  private String productId;
-
-  private String goodsId;
-
-
-  private Product product;
-  private Shipping shipping;
-
-  public Order() {
-    super();
-
+  @OnTransition(target = "Created")
+  void createOrder() {
   }
 
-  public Order(String orderId, String productId, String goodsId) {
-    this.orderId = orderId;
-    this.productId = productId;
-    this.goodsId = goodsId;
+  @OnTransition(target = "Cancelled")
+  void cancelOrder() {
   }
 
-  public String getOrderId() {
-    return orderId;
+  @OnTransition(target = "Paid")
+  void updateToPaid() {
   }
 
-  public void setOrderId(String orderId) {
-    this.orderId = orderId;
+  @OnTransition(target = "InDelivery")
+  void updateToInDelivery() {
   }
 
-  public Product getProduct() {
-    return product;
+  @OnTransition(target = "Received")
+  void updateToReceived() {
   }
 
-  public void setProduct(Product product) {
-    this.product = product;
-  }
-
-  public Shipping getShipping() {
-    return shipping;
-  }
-
-  public void setShipping(Shipping shipping) {
-    this.shipping = shipping;
-  }
-
-  public String getProductId() {
-    return productId;
-  }
-
-  public void setProductId(String productId) {
-    this.productId = productId;
-  }
-
-  public String getGoodsId() {
-    return goodsId;
-  }
-
-  public void setGoodsId(String goodsId) {
-    this.goodsId = goodsId;
+  @OnTransition(target = "Confirmed")
+  void confirm() {
   }
 }

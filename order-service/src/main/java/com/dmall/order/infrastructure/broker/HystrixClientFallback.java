@@ -1,6 +1,5 @@
 package com.dmall.order.infrastructure.broker;
 
-import com.dmall.order.domain.Product;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 

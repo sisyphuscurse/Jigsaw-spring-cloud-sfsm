@@ -12,8 +12,6 @@ import java.util.List;
 public class OrderRepositoryImpl implements OrderRepository {
 
   public List<Order> getAllOrders() {
-    return Arrays.asList(
-        new Order("o001", "p001", "g001"),
-        new Order("o002", "p002", "g002"));
+    return Arrays.asList();
   }
 }
