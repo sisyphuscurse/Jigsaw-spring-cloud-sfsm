@@ -29,6 +29,7 @@ repositories {
 	mavenCentral() 
 	jcenter()
 }
+
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web:${project.bootVersion}")    
     compile("org.springframework.boot:spring-boot-starter-actuator:${project.bootVersion}")
@@ -36,7 +37,11 @@ dependencies {
     compile("org.springframework.cloud:spring-cloud-starter-eureka")
     compile("org.springframework.cloud:spring-cloud-starter-hystrix")
     compile("org.springframework.cloud:spring-cloud-starter-feign")
-
+    compile('org.springframework.statemachine:spring-statemachine-core:1.2.6.RELEASE')
+    compile('io.springfox:springfox-swagger2:2.6.1')
+    compile('io.springfox:springfox-swagger-ui:2.7.0')
+    compile('org.projectlombok:lombok:1.16.18')
+    compile 'io.springfox:springfox-spring-web:2.6.1'
 
     testCompile group: 'junit', name: 'junit', version: '4.+'
     testCompile 'org.springframework:spring-test:4.0.6.RELEASE'

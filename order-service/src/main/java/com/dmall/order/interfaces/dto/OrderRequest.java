@@ -16,13 +16,10 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderResponse {
-  private Integer oid;
+public class OrderRequest {
   private Integer uid;
   private BigDecimal total;
   private List<OrderItem> items;
-  private String create_time;
-  private String status;
 
   @Getter
   @Setter

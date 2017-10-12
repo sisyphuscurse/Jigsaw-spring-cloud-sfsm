@@ -1,68 +1,73 @@
 package com.dmall.order.controller;
 
-import com.dmall.order.domain.Order;
-import com.dmall.order.domain.Product;
-import com.dmall.order.domain.Shipping;
-import com.dmall.order.infrastructure.broker.ProductBroker;
-import com.dmall.order.infrastructure.broker.ShippingBroker;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dmall.order.interfaces.dto.OrderRequest;
+import com.dmall.order.interfaces.dto.OrderResponse;
+import com.google.common.collect.Lists;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.ParseException;
-import java.util.Arrays;
+import java.math.BigDecimal;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/")
 public class OrderController {
 
-  @Autowired
-  private ProductBroker productBroker;
+  @RequestMapping(value = "orders", method = RequestMethod.POST, headers = "Accept=application/json")
+  public OrderResponse create_new_order(OrderRequest request) {
+
+    OrderResponse.OrderItem item = OrderResponse.OrderItem.builder()
+        .pid(1)
+        .name("iPhone8")
+        .amount(1)
+        .price(BigDecimal.valueOf(8848.00))
+        .build();
+    List<OrderResponse.OrderItem> orderItems = Lists.newArrayList(item);
+    return OrderResponse.builder()
+        .oid(1)
+        .total(BigDecimal.valueOf(8848.00))
+        .create_time("2017-10-10 13:00")
+        .status("Created")
+        .items(orderItems)
+        .build();
+  }
+
+  @RequestMapping(value = "orders/{oid}", method = RequestMethod.GET, headers = "Accept=application/json")
+  public OrderResponse get_current_order(@PathVariable("oid") Integer oid) {
+
+    OrderResponse.OrderItem item = OrderResponse.OrderItem.builder()
+        .pid(1)
+        .name("iPhone8")
+        .amount(1)
+        .price(BigDecimal.valueOf(8848.00))
+        .build();
+    List<OrderResponse.OrderItem> orderItems = Lists.newArrayList(item);
+    return OrderResponse.builder()
+        .oid(1)
+        .total(BigDecimal.valueOf(8848.00))
+        .create_time("2017-10-10 13:00")
+        .status("Created")
+        .items(orderItems)
+        .build();
+  }
 
 
-  @Autowired
-  private ShippingBroker shippingBroker;
-
-  private List<Order> orders = Arrays.asList(
-      new Order("o001", "p001", "g001"),
-      new Order("o002", "p002", "g002"));
-
-  public OrderController() throws ParseException {
+  @RequestMapping(value = "orders/{oid}/set-paid", method = RequestMethod.POST, headers = "Accept=application/json")
+  public void setPaid(@PathVariable("oid") Integer oid, String payment_id, String payment_time) {
 
   }
 
-  @RequestMapping(method = RequestMethod.GET, headers = "Accept=application/json")
-  public List<Order> getOrders() {
-    return orders;
-  }
+  @RequestMapping(value = "/orders/{oid}/deliver", method = RequestMethod.POST, headers = "Accept=application/json")
+  public void deliver(@PathVariable("oid") Integer oid, String shipping_id, String shipments_time) {
 
-  @RequestMapping(value = "{orderId}", method = RequestMethod.GET, headers = "Accept=application/json")
-  public Order getTaskByTaskId(@PathVariable("orderId") String orderId) {
-    Order orderToReturn = null;
-    for (Order order : orders) {
-      if (order.getOrderId().equalsIgnoreCase(orderId)) {
-        orderToReturn = order;
-        break;
-      }
-    }
-
-    if (orderToReturn != null) {
-      Product product = this.productBroker.getProductDetial(orderToReturn.getProductId());
-      orderToReturn.setProduct(product);
-      Shipping shipping = shippingBroker.getShippingDetail(orderToReturn.getGoodsId());
-      orderToReturn.setShipping(shipping);
-    }
-
-    return orderToReturn;
   }
 
 
-  @RequestMapping(value = "shippings/{goodsId}", method = RequestMethod.GET, headers = "Accept=application/json")
-  public Shipping getPatientById(@PathVariable("goodsId") String goodsId) {
+  @RequestMapping(value = "/orders/{oid}/confirm", method = RequestMethod.POST, headers = "Accept=application/json")
+  public void confirm(@PathVariable("oid") Integer oid, String shipping_id, String shipments_time) {
 
-    return shippingBroker.getShippingDetail(goodsId);
   }
 }
