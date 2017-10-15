@@ -2,9 +2,13 @@ package com.dmall.order.domain;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.ExtendedState;
+import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.StateMachinePersist;
 import org.springframework.statemachine.annotation.EventHeaders;
+import org.springframework.statemachine.annotation.OnStateChanged;
 import org.springframework.statemachine.annotation.OnTransition;
 import org.springframework.statemachine.annotation.WithStateMachine;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -12,6 +16,9 @@ import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
+import org.springframework.statemachine.persist.DefaultStateMachinePersister;
+import org.springframework.statemachine.persist.StateMachinePersister;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.EnumSet;
 import java.util.Map;
@@ -65,8 +72,16 @@ public class OrderStateMachine extends EnumStateMachineConfigurerAdapter<OrderSt
         .event(OrderEvents.OrderCancelled);
   }
 
+  @Autowired
+  private OrderRepository repository;
+
   @OnTransition(source = "Idle", target = "Created")
-  public void createOrder(@EventHeaders Map<String, Object> headers, ExtendedState extendedState) {
+  public void createOrder(@EventHeaders Map<String, Object> headers, ExtendedState extendedState, StateMachine<String, String> stateMachine) {
+    Order order = (Order) headers.get("order");
+
+    order.setOrderCreation();
+    repository.save(order);
+
     log.debug("order is created");
   }
 
@@ -89,5 +104,25 @@ public class OrderStateMachine extends EnumStateMachineConfigurerAdapter<OrderSt
   @OnTransition(target = "Confirmed")
   public void confirm() {
 
+  }
+
+  @Autowired
+  private WebApplicationContext context;
+
+  @Autowired
+  private StateMachinePersist<OrderStates, OrderEvents, String> orderStatemachinePersist;
+
+  @OnStateChanged
+  public void onStateChanged(@EventHeaders Map<String, Object> headers, ExtendedState extendedState, StateMachine<OrderStates, OrderEvents> stateMachine) {
+
+    if (stateMachine.getState() != stateMachine.getInitialState()) {
+      StateMachinePersister<OrderStates, OrderEvents, String> persister = new DefaultStateMachinePersister<>(orderStatemachinePersist);
+      Order order = (Order) headers.get("order");
+      try {
+        persister.persist(stateMachine, String.valueOf(order.getOid()));
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
   }
 }

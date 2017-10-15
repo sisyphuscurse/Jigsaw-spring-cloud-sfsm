@@ -26,7 +26,7 @@ public class OrderRepositoryImpl implements OrderRepository {
   }
 
   @Override
-  public Integer save(Order order) {
+  public Order save(Order order) {
 
     Order savedOrder = repository.save(order);
 
@@ -35,6 +35,6 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     orderItemJpaRepository.save(order.getItems());
 
-    return order.getOid();
+    return savedOrder;
   }
 }

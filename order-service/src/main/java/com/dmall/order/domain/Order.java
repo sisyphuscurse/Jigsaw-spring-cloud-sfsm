@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.Column;
@@ -55,6 +58,9 @@ public class Order {
   @Transient
   private List<OrderItem> items;
 
+  @Transient
+  private StateMachine<OrderStates, OrderEvents> stateMachine;
+
   public void cancelOrder() {
     state = OrderStates.Cancelled;
   }
@@ -81,5 +87,20 @@ public class Order {
 
     this.setState(OrderStates.Created);
     this.setCreate_time(current_datetime);
+  }
+
+  public void notifyOrderCreated() {
+
+    Message<OrderEvents> message = MessageBuilder
+        .withPayload(OrderEvents.OrderCreated)
+        .setHeader("order", this)
+        .build();
+
+    stateMachine.sendEvent(message);
+  }
+
+  public void installStateMachine(StateMachine<OrderStates, OrderEvents> stateMachine) {
+    this.stateMachine = stateMachine;
+    stateMachine.start();
   }
 }

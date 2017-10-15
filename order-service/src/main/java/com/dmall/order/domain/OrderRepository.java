@@ -4,5 +4,5 @@ public interface OrderRepository {
 
   Order getOrderById();
 
-  Integer save(Order order);
+  Order save(Order order);
 }

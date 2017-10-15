@@ -5,18 +5,14 @@ import com.dmall.order.domain.OrderEvents;
 import com.dmall.order.domain.OrderRepository;
 import com.dmall.order.domain.OrderStateMachineFactory;
 import com.dmall.order.domain.OrderStates;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.config.StateMachineFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.statemachine.StateMachinePersist;
+import org.springframework.statemachine.persist.DefaultStateMachinePersister;
+import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.stereotype.Service;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 @Service
 public class OrderService {
@@ -26,7 +22,7 @@ public class OrderService {
 
 
   @Autowired
-  public OrderService(OrderRepository repository,OrderStateMachineFactory factory) {
+  public OrderService(OrderRepository repository, OrderStateMachineFactory factory) {
     this.repository = repository;
     this.factory = factory;
   }
@@ -34,19 +30,11 @@ public class OrderService {
 
   public void createOrder(Order order) {
 
-    // due to order id is used as machine id, we should get order id before state machine created.
+    StateMachine<OrderStates, OrderEvents> stateMachine = factory.newStatemachine("orderStateMachine");
 
-    order.setOrderCreation();
-    Integer oid = repository.save(order);
+    order.installStateMachine(stateMachine);
 
-    StateMachine<OrderStates, OrderEvents> stateMachine = factory.createAndStart(oid);
-
-    Message<OrderEvents> message = MessageBuilder
-        .withPayload(OrderEvents.OrderCreated)
-        .setHeader("order", order)
-        .build();
-
-    stateMachine.sendEvent(message);
+    order.notifyOrderCreated();
   }
 
   public Order getOrderById(Integer oid) {
