@@ -1,5 +1,6 @@
 package com.dmall.order.interfaces;
 
+import com.dmall.order.interfaces.dto.OrderRequest;
 import com.dmall.order.interfaces.dto.OrderResponse;
 import org.springframework.http.ResponseEntity;
 
@@ -9,4 +10,6 @@ import org.springframework.http.ResponseEntity;
 public interface OrderApiDelegate {
 
   ResponseEntity<OrderResponse> getAllOrders();
+
+  void createOrder(OrderRequest request);
 }

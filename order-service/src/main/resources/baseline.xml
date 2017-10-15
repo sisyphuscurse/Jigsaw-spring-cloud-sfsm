@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="create order table" author="Leo">
+        <createTable tableName="orders">
+            <column name="oid" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uid" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_time" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_price" type="decimal(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state" type="varchar(20)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create order item table" author="Leo">
+        <createTable tableName="order_items">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="oid" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pid" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(20)"/>
+            <column name="price" type="decimal(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

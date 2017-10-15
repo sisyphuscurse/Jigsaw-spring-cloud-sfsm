@@ -2,58 +2,84 @@
 package com.dmall.order.domain;
 
 
-import com.dmall.order.infrastructure.broker.Product;
-import com.dmall.order.infrastructure.broker.Shipping;
-import com.dmall.order.interfaces.dto.OrderRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.statemachine.annotation.OnTransition;
-import org.springframework.statemachine.annotation.WithStateMachine;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
-@WithStateMachine
 @Getter
 @Setter
 @Builder
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
+@Entity
+@Table(name = "orders")
 public class Order {
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer oid;
+
+  @Column(nullable = false)
   private Integer uid;
-  private BigDecimal total;
-  private List<OrderItem> items;
+
+  @Column(nullable = false)
+  private BigDecimal total_price;
+
+  @Column(nullable = false)
   private String create_time;
-  private String status;
 
-  @OnTransition(target = "Created")
-  void createOrder() {
+  @Enumerated(EnumType.STRING)
+  private OrderStates state;
+
+  @Transient
+  private List<OrderItem> items;
+
+  public void cancelOrder() {
+    state = OrderStates.Cancelled;
   }
 
-  @OnTransition(target = "Cancelled")
-  void cancelOrder() {
+  public void setPaid() {
+    state = OrderStates.Paid;
   }
 
-  @OnTransition(target = "Paid")
-  void updateToPaid() {
+  public void setInDelivery() {
+    state = OrderStates.InDelivery;
   }
 
-  @OnTransition(target = "InDelivery")
-  void updateToInDelivery() {
+  public void receive() {
+    state = OrderStates.Received;
   }
 
-  @OnTransition(target = "Received")
-  void updateToReceived() {
+  public void confirm() {
+    state = OrderStates.Confirmed;
   }
 
-  @OnTransition(target = "Confirmed")
-  void confirm() {
+  public void setOrderCreation() {
+    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    String current_datetime = format.format(new Date());
+
+    this.setState(OrderStates.Created);
+    this.setCreate_time(current_datetime);
   }
 }

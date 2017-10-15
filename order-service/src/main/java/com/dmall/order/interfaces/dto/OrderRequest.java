@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderRequest {
   private Integer uid;
-  private BigDecimal total;
+  private BigDecimal total_price;
   private List<OrderItem> items;
 
   @Getter

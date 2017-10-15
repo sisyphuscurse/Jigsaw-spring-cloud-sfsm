@@ -31,5 +31,5 @@ Event emitted publicly are published via a broker topic named `order-OrderEvent`
 
 ## Events consumed
 
-* **ShippingService.ArticleShipped** - Update order status.
-* **ShippingService.ArticleReceived** - Update order status.
+* **ShippingService.ArticleShipped** - Update order state.
+* **ShippingService.ArticleReceived** - Update order state.

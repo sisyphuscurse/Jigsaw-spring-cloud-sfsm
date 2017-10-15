@@ -1,8 +1,10 @@
 package com.dmall.order.controller;
 
+import com.dmall.order.interfaces.OrderFacade;
 import com.dmall.order.interfaces.dto.OrderRequest;
 import com.dmall.order.interfaces.dto.OrderResponse;
 import com.google.common.collect.Lists;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,8 +18,17 @@ import java.util.List;
 @RequestMapping("/")
 public class OrderController {
 
+  private OrderFacade orderFacade;
+
+  @Autowired
+  public OrderController(OrderFacade orderFacade) {
+    this.orderFacade = orderFacade;
+  }
+
   @RequestMapping(value = "orders", method = RequestMethod.POST, headers = "Accept=application/json")
   public OrderResponse create_new_order(OrderRequest request) {
+
+    orderFacade.createOrder(request);
 
     OrderResponse.OrderItem item = OrderResponse.OrderItem.builder()
         .pid(1)
@@ -26,6 +37,7 @@ public class OrderController {
         .price(BigDecimal.valueOf(8848.00))
         .build();
     List<OrderResponse.OrderItem> orderItems = Lists.newArrayList(item);
+
     return OrderResponse.builder()
         .oid(1)
         .total(BigDecimal.valueOf(8848.00))

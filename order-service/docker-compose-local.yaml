@@ -1,0 +1,16 @@
+version: '2'
+
+version: "2"
+services:
+  dmall.order.db:
+    image: percona:5.6
+    environment:
+      - MYSQL_ROOT_PASSWORD=1q2w3e4r5t
+    tmpfs:
+      - /tmp/order_mysql
+    ports:
+      - 3312:3306
+
+networks:
+  jenkins_dmall-network:
+    external: true
