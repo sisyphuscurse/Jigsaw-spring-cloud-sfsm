@@ -77,6 +77,10 @@ public class OrderController {
     orderFacade.notifyInDelivery(oid, shipping_id, shipments_time);
   }
 
+  @RequestMapping(value = "/orders/{oid}/set-received", method = RequestMethod.POST, headers = "Accept=application/json")
+  public void receive(@PathVariable("oid") Integer oid, Integer shipping_id, String receive_time) {
+    orderFacade.notifyReceivd(oid, shipping_id, receive_time);
+  }
 
   @RequestMapping(value = "/orders/{oid}/confirm", method = RequestMethod.POST, headers = "Accept=application/json")
   public void confirm(@PathVariable("oid") Integer oid, String uid) {

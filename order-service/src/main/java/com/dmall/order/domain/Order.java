@@ -98,16 +98,16 @@ public class Order {
 
   public void notifyPaid(String payment_id, String payment_time) {
 
-    state = OrderStates.Paid;
-    payment = new Payment(null, payment_id, oid, payment_time);
+    this.state = OrderStates.Paid;
+    this.payment = new Payment(null, payment_id, oid, payment_time);
 
     sendEvent(OrderEvents.OrderPaid);
   }
 
 
   public void notifyInDelivery(String shipping_id, String shipping_time) {
-    state = OrderStates.InDelivery;
-    shipment = new Shipment(null, shipping_id, oid, shipping_time);
+    this.state = OrderStates.InDelivery;
+    this.shipment = new Shipment(null, shipping_id, oid, shipping_time, null);
 
     sendEvent(OrderEvents.OrderShipped);
   }
@@ -127,4 +127,14 @@ public class Order {
     stateMachine.sendEvent(message);
   }
 
+  public void notifyReceived(Integer shipping_id, String received_time) {
+    Message<OrderEvents> message = MessageBuilder
+        .withPayload(OrderEvents.OrderReceived)
+        .setHeader("order", this)
+        .setHeader("shipping_id", shipping_id)
+        .setHeader("received_time", received_time)
+        .build();
+
+    stateMachine.sendEvent(message);
+  }
 }

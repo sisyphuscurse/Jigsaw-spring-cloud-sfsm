@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Repository
 @Transactional
 public class OrderRepositoryImpl implements OrderRepository {
@@ -28,7 +30,14 @@ public class OrderRepositoryImpl implements OrderRepository {
 
   @Override
   public Order getOrderById(Integer oid) {
-    return repository.findOne(oid);
+    Order order = repository.findOne(oid);
+
+    if (Objects.nonNull(order)) {
+      order.setPayment(paymentJpaRepository.findByOid(oid));
+      order.setShipment(shipmentJpaRepository.findByOid(oid));
+    }
+
+    return order;
   }
 
   @Override
@@ -52,6 +61,12 @@ public class OrderRepositoryImpl implements OrderRepository {
 
   @Override
   public void notifyShipped(Order order) {
+    repository.save(order); //maybe is not necessary.
+    shipmentJpaRepository.save(order.getShipment());
+  }
+
+  @Override
+  public void notifyReceived(Order order) {
     repository.save(order); //maybe is not necessary.
     shipmentJpaRepository.save(order.getShipment());
   }

@@ -6,5 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 public interface ShipmentJpaRepository extends CrudRepository<Shipment, Integer> {
+  Shipment findByOid(Integer oid);
 
 }

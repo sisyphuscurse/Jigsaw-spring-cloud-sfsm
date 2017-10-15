@@ -73,4 +73,9 @@ public class OrderService {
     return null;
   }
 
+  public void notifyReceived(Integer oid, Integer shipping_id, String receive_time) {
+    Order order = prepareInstance(oid);
+    order.notifyReceived(shipping_id, receive_time);
+
+  }
 }

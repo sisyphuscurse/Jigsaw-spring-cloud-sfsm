@@ -33,4 +33,5 @@ public class Shipment {
 
   private Integer oid;
   private String shipping_time;
+  private String received_time;
 }

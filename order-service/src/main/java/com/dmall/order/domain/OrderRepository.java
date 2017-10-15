@@ -9,4 +9,6 @@ public interface OrderRepository {
   void notifyPaid(Order order);
 
   void notifyShipped(Order order);
+
+  void notifyReceived(Order order);
 }

@@ -64,7 +64,7 @@ public class OrderStateMachine extends EnumStateMachineConfigurerAdapter<OrderSt
         .and()
         .withExternal()
         .source(OrderStates.InDelivery).target(OrderStates.Received)
-        .event(OrderEvents.OrderShipped)
+        .event(OrderEvents.OrderReceived)
         .and()
         .withExternal()
         .source(OrderStates.Received).target(OrderStates.Confirmed)
@@ -99,8 +99,16 @@ public class OrderStateMachine extends EnumStateMachineConfigurerAdapter<OrderSt
     repository.notifyShipped(order);
   }
 
-  @OnTransition(target = "Received")
-  public void updateToReceived() {
+  @OnTransition(source = "InDelivery", target = "Received")
+  public void updateToReceived(@EventHeaders Map<String, Object> headers) {
+    Order order = (Order) headers.get("order");
+    Integer shippingId = (Integer) headers.get("shipping_id");
+    String receivedTime = (String) headers.get("received_time");
+    order.getShipment().setReceived_time(receivedTime);
+    order.setState(OrderStates.Received);
+    OrderRepository repository = context.getBean(OrderRepository.class);
+
+    repository.notifyReceived(order);
   }
 
   @OnTransition(target = "Confirmed")

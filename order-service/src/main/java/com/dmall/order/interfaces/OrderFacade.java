@@ -49,4 +49,10 @@ public class OrderFacade implements OrderApiDelegate {
     orderService.notifyInDelivery(oid, shipping_id, shipping_time);
 
   }
+
+  @Override
+  public void notifyReceivd(Integer oid, Integer shipping_id, String receive_time) {
+    orderService.notifyReceived(oid, shipping_id, receive_time);
+
+  }
 }

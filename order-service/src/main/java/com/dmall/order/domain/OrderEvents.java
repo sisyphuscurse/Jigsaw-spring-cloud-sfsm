@@ -7,5 +7,6 @@ public enum OrderEvents {
   OrderPaid,
   OrderConfirmed,
   OrderShipped,
+  OrderReceived,
   OrderCancelled
 }

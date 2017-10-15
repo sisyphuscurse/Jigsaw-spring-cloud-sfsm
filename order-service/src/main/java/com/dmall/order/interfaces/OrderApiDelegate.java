@@ -16,4 +16,6 @@ public interface OrderApiDelegate {
   void notifyPaid(Integer oid, String payment_id, String payment_time);
 
   void notifyInDelivery(Integer oid, String shipping_id, String shipping_time);
+
+  void notifyReceivd(Integer oid, Integer shipping_id, String receive_time);
 }

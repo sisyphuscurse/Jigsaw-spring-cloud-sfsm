@@ -76,4 +76,10 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="add column to shipments table" author="Leo">
+        <addColumn tableName="shipments">
+            <column name="received_time" type="varchar(20)"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
