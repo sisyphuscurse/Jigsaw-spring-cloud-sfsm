@@ -69,12 +69,12 @@ public class OrderController {
 
   @RequestMapping(value = "orders/{oid}/set-paid", method = RequestMethod.POST, headers = "Accept=application/json")
   public void setPaid(@PathVariable("oid") Integer oid, String payment_id, String payment_time) {
-    orderFacade.setPaid(oid, payment_id, payment_time);
+    orderFacade.notifyPaid(oid, payment_id, payment_time);
   }
 
   @RequestMapping(value = "/orders/{oid}/deliver", method = RequestMethod.POST, headers = "Accept=application/json")
   public void deliver(@PathVariable("oid") Integer oid, String shipping_id, String shipments_time) {
-
+    orderFacade.notifyInDelivery(oid, shipping_id, shipments_time);
   }
 
 

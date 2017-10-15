@@ -16,11 +16,14 @@ public class OrderRepositoryImpl implements OrderRepository {
 
   private PaymentJpaRepository paymentJpaRepository;
 
+  private ShipmentJpaRepository shipmentJpaRepository;
+
   @Autowired
-  public OrderRepositoryImpl(OrderJpaRepository repository, OrderItemJpaRepository orderItemJpaRepository, PaymentJpaRepository paymentJpaRepository) {
+  public OrderRepositoryImpl(OrderJpaRepository repository, OrderItemJpaRepository orderItemJpaRepository, PaymentJpaRepository paymentJpaRepository, ShipmentJpaRepository shipmentJpaRepository) {
     this.repository = repository;
     this.orderItemJpaRepository = orderItemJpaRepository;
     this.paymentJpaRepository = paymentJpaRepository;
+    this.shipmentJpaRepository = shipmentJpaRepository;
   }
 
   @Override
@@ -45,5 +48,11 @@ public class OrderRepositoryImpl implements OrderRepository {
   public void notifyPaid(Order order) {
     repository.save(order);
     paymentJpaRepository.save(order.getPayment());
+  }
+
+  @Override
+  public void notifyShipped(Order order) {
+    repository.save(order); //maybe is not necessary.
+    shipmentJpaRepository.save(order.getShipment());
   }
 }

@@ -13,5 +13,7 @@ public interface OrderApiDelegate {
 
   void createOrder(OrderRequest request);
 
-  void setPaid(Integer oid, String payment_id, String payment_time);
+  void notifyPaid(Integer oid, String payment_id, String payment_time);
+
+  void notifyInDelivery(Integer oid, String shipping_id, String shipping_time);
 }

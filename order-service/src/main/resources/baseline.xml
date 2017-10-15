@@ -59,4 +59,21 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="create shipments table" author="Leo">
+        <createTable tableName="shipments">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="oid" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipping_id" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shipping_time" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

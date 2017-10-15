@@ -43,11 +43,18 @@ public class OrderService {
     return repository.getOrderById(oid);
   }
 
-  public void setPaid(Integer oid, String payment_id, String payment_time) {
+  public void notifyPaid(Integer oid, String payment_id, String payment_time) {
 
     Order order = prepareInstance(oid);
 
     order.notifyPaid(payment_id, payment_time);
+  }
+
+
+  public void notifyInDelivery(Integer oid, String shipping_id, String shipping_time) {
+    Order order = prepareInstance(oid);
+
+    order.notifyInDelivery(shipping_id, shipping_time);
   }
 
   private Order prepareInstance(Integer oid) {
@@ -65,4 +72,5 @@ public class OrderService {
     }
     return null;
   }
+
 }

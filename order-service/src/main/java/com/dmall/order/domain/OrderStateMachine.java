@@ -84,10 +84,6 @@ public class OrderStateMachine extends EnumStateMachineConfigurerAdapter<OrderSt
     repository.save(order);
   }
 
-  @OnTransition(target = "Cancelled")
-  public void cancelOrder() {
-  }
-
   @OnTransition(source = "Created", target = "Paid")
   public void notifyPaid(@EventHeaders Map<String, Object> headers) {
     OrderRepository repository = context.getBean(OrderRepository.class);
@@ -96,8 +92,11 @@ public class OrderStateMachine extends EnumStateMachineConfigurerAdapter<OrderSt
 
   }
 
-  @OnTransition(target = "InDelivery")
-  public void updateToInDelivery() {
+  @OnTransition(source = "Paid", target = "InDelivery")
+  public void updateToInDelivery(@EventHeaders Map<String, Object> headers) {
+    OrderRepository repository = context.getBean(OrderRepository.class);
+    Order order = (Order) headers.get("order");
+    repository.notifyShipped(order);
   }
 
   @OnTransition(target = "Received")
@@ -107,6 +106,10 @@ public class OrderStateMachine extends EnumStateMachineConfigurerAdapter<OrderSt
   @OnTransition(target = "Confirmed")
   public void confirm() {
 
+  }
+
+  @OnTransition(target = "Cancelled")
+  public void cancelOrder() {
   }
 
   @OnStateChanged

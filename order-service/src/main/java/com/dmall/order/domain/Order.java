@@ -64,6 +64,9 @@ public class Order {
   @Transient
   private Payment payment;
 
+  @Transient
+  private Shipment shipment;
+
   public void cancelOrder() {
     state = OrderStates.Cancelled;
   }
@@ -102,6 +105,14 @@ public class Order {
   }
 
 
+  public void notifyInDelivery(String shipping_id, String shipping_time) {
+    state = OrderStates.InDelivery;
+    shipment = new Shipment(null, shipping_id, oid, shipping_time);
+
+    sendEvent(OrderEvents.OrderShipped);
+  }
+
+
   public void installStateMachine(StateMachine<OrderStates, OrderEvents> stateMachine) {
     this.stateMachine = stateMachine;
     stateMachine.start();
@@ -115,4 +126,5 @@ public class Order {
 
     stateMachine.sendEvent(message);
   }
+
 }

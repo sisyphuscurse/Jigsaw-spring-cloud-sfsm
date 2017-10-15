@@ -7,4 +7,6 @@ public interface OrderRepository {
   Order save(Order order);
 
   void notifyPaid(Order order);
+
+  void notifyShipped(Order order);
 }
