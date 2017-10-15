@@ -61,13 +61,13 @@ public class Order {
   @Transient
   private StateMachine<OrderStates, OrderEvents> stateMachine;
 
+  @Transient
+  private Payment payment;
+
   public void cancelOrder() {
     state = OrderStates.Cancelled;
   }
 
-  public void setPaid() {
-    state = OrderStates.Paid;
-  }
 
   public void setInDelivery() {
     state = OrderStates.InDelivery;
@@ -90,17 +90,29 @@ public class Order {
   }
 
   public void notifyOrderCreated() {
-
-    Message<OrderEvents> message = MessageBuilder
-        .withPayload(OrderEvents.OrderCreated)
-        .setHeader("order", this)
-        .build();
-
-    stateMachine.sendEvent(message);
+    sendEvent(OrderEvents.OrderCreated);
   }
+
+  public void notifyPaid(String payment_id, String payment_time) {
+
+    state = OrderStates.Paid;
+    payment = new Payment(null, payment_id, oid, payment_time);
+
+    sendEvent(OrderEvents.OrderPaid);
+  }
+
 
   public void installStateMachine(StateMachine<OrderStates, OrderEvents> stateMachine) {
     this.stateMachine = stateMachine;
     stateMachine.start();
+  }
+
+  private void sendEvent(OrderEvents orderEvents) {
+    Message<OrderEvents> message = MessageBuilder
+        .withPayload(orderEvents)
+        .setHeader("order", this)
+        .build();
+
+    stateMachine.sendEvent(message);
   }
 }

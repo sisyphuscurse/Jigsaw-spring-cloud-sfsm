@@ -4,6 +4,7 @@ import com.dmall.order.application.OrderService;
 import com.dmall.order.domain.Order;
 import com.dmall.order.domain.OrderEvents;
 import com.dmall.order.domain.OrderStates;
+import com.dmall.order.domain.Payment;
 import com.dmall.order.interfaces.assembler.OrderAssembler;
 import com.dmall.order.interfaces.dto.OrderRequest;
 import com.dmall.order.interfaces.dto.OrderResponse;
@@ -37,5 +38,10 @@ public class OrderFacade implements OrderApiDelegate {
   public void createOrder(OrderRequest request) {
     Order order = orderAssembler.toDomainObject(request);
     orderService.createOrder(order);
+  }
+
+  @Override
+  public void setPaid(Integer oid, String payment_id, String payment_time) {
+    orderService.setPaid(oid, payment_id, payment_time);
   }
 }

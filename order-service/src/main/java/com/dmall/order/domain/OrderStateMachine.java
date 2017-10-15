@@ -29,6 +29,9 @@ import java.util.Map;
 @WithStateMachine(id = "orderStateMachine")
 public class OrderStateMachine extends EnumStateMachineConfigurerAdapter<OrderStates, OrderEvents> {
 
+  @Autowired
+  private WebApplicationContext context;
+
   @Override
   public void configure(StateMachineConfigurationConfigurer<OrderStates, OrderEvents> config) throws Exception {
     config
@@ -72,25 +75,25 @@ public class OrderStateMachine extends EnumStateMachineConfigurerAdapter<OrderSt
         .event(OrderEvents.OrderCancelled);
   }
 
-  @Autowired
-  private OrderRepository repository;
 
   @OnTransition(source = "Idle", target = "Created")
   public void createOrder(@EventHeaders Map<String, Object> headers, ExtendedState extendedState, StateMachine<String, String> stateMachine) {
+    OrderRepository repository = context.getBean(OrderRepository.class);
     Order order = (Order) headers.get("order");
-
     order.setOrderCreation();
     repository.save(order);
-
-    log.debug("order is created");
   }
 
   @OnTransition(target = "Cancelled")
   public void cancelOrder() {
   }
 
-  @OnTransition(target = "Paid")
-  public void updateToPaid() {
+  @OnTransition(source = "Created", target = "Paid")
+  public void notifyPaid(@EventHeaders Map<String, Object> headers) {
+    OrderRepository repository = context.getBean(OrderRepository.class);
+    Order order = (Order) headers.get("order");
+    repository.notifyPaid(order);
+
   }
 
   @OnTransition(target = "InDelivery")
@@ -106,16 +109,11 @@ public class OrderStateMachine extends EnumStateMachineConfigurerAdapter<OrderSt
 
   }
 
-  @Autowired
-  private WebApplicationContext context;
-
-  @Autowired
-  private StateMachinePersist<OrderStates, OrderEvents, String> orderStatemachinePersist;
-
   @OnStateChanged
   public void onStateChanged(@EventHeaders Map<String, Object> headers, ExtendedState extendedState, StateMachine<OrderStates, OrderEvents> stateMachine) {
 
     if (stateMachine.getState() != stateMachine.getInitialState()) {
+      StateMachinePersist<OrderStates, OrderEvents, String> orderStatemachinePersist = context.getBean(StateMachinePersist.class);
       StateMachinePersister<OrderStates, OrderEvents, String> persister = new DefaultStateMachinePersister<>(orderStatemachinePersist);
       Order order = (Order) headers.get("order");
       try {

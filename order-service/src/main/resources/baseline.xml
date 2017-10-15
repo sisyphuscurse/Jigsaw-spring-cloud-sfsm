@@ -41,4 +41,22 @@
             </column>
         </createTable>
     </changeSet>
+
+    <changeSet id="create payments table" author="Leo">
+        <createTable tableName="payments">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="oid" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_id" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_time" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

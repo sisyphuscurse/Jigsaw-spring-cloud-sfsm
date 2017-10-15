@@ -12,4 +12,6 @@ public interface OrderApiDelegate {
   ResponseEntity<OrderResponse> getAllOrders();
 
   void createOrder(OrderRequest request);
+
+  void setPaid(Integer oid, String payment_id, String payment_time);
 }
