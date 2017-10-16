@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.access.StateMachineAccess;
+import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.Column;
@@ -135,6 +137,6 @@ public class Order {
         .setHeader("received_time", received_time)
         .build();
 
-    stateMachine.sendEvent(message);
+    boolean flag = stateMachine.sendEvent(message);
   }
 }

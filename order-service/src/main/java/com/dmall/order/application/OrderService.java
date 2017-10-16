@@ -7,16 +7,20 @@ import com.dmall.order.domain.OrderStates;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachinePersist;
+import org.springframework.statemachine.access.StateMachineAccess;
 import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.persist.DefaultStateMachinePersister;
 import org.springframework.statemachine.persist.StateMachinePersister;
+import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
 public class OrderService {
 
+  public static final String ORDER_STATE_MACHINE = "orderStateMachine";
   private final StateMachineFactory<OrderStates, OrderEvents> factory;
   private OrderRepository repository;
   private StateMachinePersister<OrderStates, OrderEvents, String> persister;
@@ -32,7 +36,7 @@ public class OrderService {
 
   public void createOrder(Order order) {
 
-    StateMachine<OrderStates, OrderEvents> stateMachine = factory.getStateMachine("orderStateMachine");
+    StateMachine<OrderStates, OrderEvents> stateMachine = factory.getStateMachine(ORDER_STATE_MACHINE);
 
     order.installStateMachine(stateMachine);
 
@@ -60,15 +64,18 @@ public class OrderService {
   private Order prepareInstance(Integer oid) {
     Order order = repository.getOrderById(oid);
     if (Objects.nonNull(oid)) {
-      StateMachine<OrderStates, OrderEvents> stateMachine = factory.getStateMachine("orderStateMachine");
-      try {
-        persister.restore(stateMachine, String.valueOf(oid));
-        order.setStateMachine(stateMachine);
-        return order;
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
 
+      StateMachine<OrderStates, OrderEvents> stateMachine = factory.getStateMachine(ORDER_STATE_MACHINE);
+      List<StateMachineAccess<OrderStates, OrderEvents>> withAllRegions = stateMachine.getStateMachineAccessor().withAllRegions();
+      for (StateMachineAccess<OrderStates, OrderEvents> region : withAllRegions) {
+        region.resetStateMachine(
+            new DefaultStateMachineContext<>(order.getState(),null, null, null, null, ORDER_STATE_MACHINE));
+      }
+      stateMachine.start();
+
+      order.setStateMachine(stateMachine);
+
+      return order;
     }
     return null;
   }
