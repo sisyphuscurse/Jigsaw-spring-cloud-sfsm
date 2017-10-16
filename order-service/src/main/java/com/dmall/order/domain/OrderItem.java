@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 @Setter
 @EqualsAndHashCode
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "order_items")
 @Builder

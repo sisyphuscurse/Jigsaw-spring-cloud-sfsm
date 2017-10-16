@@ -1,8 +1,9 @@
 package com.dmall.order.controller;
 
-import com.dmall.order.interfaces.OrderFacade;
-import com.dmall.order.interfaces.dto.OrderRequest;
-import com.dmall.order.interfaces.dto.OrderResponse;
+import com.dmall.order.domain.OrderDAO;
+import com.dmall.order.application.OrderService;
+import com.dmall.order.interfaces.dto.CreateOrderRequest;
+import com.dmall.order.interfaces.dto.CreateOrderResponse;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,27 +19,31 @@ import java.util.List;
 @RequestMapping("/")
 public class OrderController {
 
-  private OrderFacade orderFacade;
+  @Autowired
+  private OrderService orderService;
 
   @Autowired
-  public OrderController(OrderFacade orderFacade) {
-    this.orderFacade = orderFacade;
+  private OrderDAO orderDAO;
+
+  @Autowired
+  public OrderController(OrderService orderService) {
+    this.orderService = orderService;
   }
 
   @RequestMapping(value = "orders", method = RequestMethod.POST, headers = "Accept=application/json")
-  public OrderResponse create_new_order(OrderRequest request) {
+  public CreateOrderResponse create_new_order(CreateOrderRequest request) {
 
-    orderFacade.createOrder(request);
+    orderService.createOrder(request);
 
-    OrderResponse.OrderItem item = OrderResponse.OrderItem.builder()
+    CreateOrderResponse.OrderItem item = CreateOrderResponse.OrderItem.builder()
         .pid(1)
         .name("iPhone8")
         .amount(1)
         .price(BigDecimal.valueOf(8848.00))
         .build();
-    List<OrderResponse.OrderItem> orderItems = Lists.newArrayList(item);
+    List<CreateOrderResponse.OrderItem> orderItems = Lists.newArrayList(item);
 
-    return OrderResponse.builder()
+    return CreateOrderResponse.builder()
         .oid(1)
         .total(BigDecimal.valueOf(8848.00))
         .create_time("2017-10-10 13:00")
@@ -48,16 +53,16 @@ public class OrderController {
   }
 
   @RequestMapping(value = "orders/{oid}", method = RequestMethod.GET, headers = "Accept=application/json")
-  public OrderResponse get_current_order(@PathVariable("oid") Integer oid) {
+  public CreateOrderResponse get_current_order(@PathVariable("oid") Integer oid) {
 
-    OrderResponse.OrderItem item = OrderResponse.OrderItem.builder()
+    CreateOrderResponse.OrderItem item = CreateOrderResponse.OrderItem.builder()
         .pid(1)
         .name("iPhone8")
         .amount(1)
         .price(BigDecimal.valueOf(8848.00))
         .build();
-    List<OrderResponse.OrderItem> orderItems = Lists.newArrayList(item);
-    return OrderResponse.builder()
+    List<CreateOrderResponse.OrderItem> orderItems = Lists.newArrayList(item);
+    return CreateOrderResponse.builder()
         .oid(1)
         .total(BigDecimal.valueOf(8848.00))
         .create_time("2017-10-10 13:00")
@@ -69,22 +74,22 @@ public class OrderController {
 
   @RequestMapping(value = "orders/{oid}/set-paid", method = RequestMethod.POST, headers = "Accept=application/json")
   public void setPaid(@PathVariable("oid") Integer oid, String payment_id, String payment_time) {
-    orderFacade.notifyPaid(oid, payment_id, payment_time);
+      orderService.notifyPaid(oid, payment_id, payment_time);
   }
 
   @RequestMapping(value = "/orders/{oid}/deliver", method = RequestMethod.POST, headers = "Accept=application/json")
   public void deliver(@PathVariable("oid") Integer oid, String shipping_id, String shipments_time) {
-    orderFacade.notifyInDelivery(oid, shipping_id, shipments_time);
+    orderService.notifyInDelivery(oid, shipping_id, shipments_time);
   }
 
   @RequestMapping(value = "/orders/{oid}/set-received", method = RequestMethod.POST, headers = "Accept=application/json")
   public void receive(@PathVariable("oid") Integer oid, Integer shipping_id, String receive_time) {
-    orderFacade.notifyReceivd(oid, shipping_id, receive_time);
+    orderService.notifyReceived(oid, shipping_id, receive_time);
   }
 
   @RequestMapping(value = "/orders/{oid}/confirm", method = RequestMethod.POST, headers = "Accept=application/json")
   public void confirm(@PathVariable("oid") Integer oid, String uid) {
-
+    orderService.confirmOrder(oid, uid);
   }
 
   @RequestMapping(value = "/orders/{oid}/cancel", method = RequestMethod.POST, headers = "Accept=application/json")

@@ -25,17 +25,13 @@ public class OrderStateMachineConfig extends EnumStateMachineConfigurerAdapter<O
   public void configure(StateMachineStateConfigurer<OrderStates, OrderEvents> states) throws Exception {
     states
         .withStates()
-        .initial(OrderStates.Idle)
+        .initial(OrderStates.Created)
         .states(EnumSet.allOf(OrderStates.class));
   }
 
   @Override
   public void configure(StateMachineTransitionConfigurer<OrderStates, OrderEvents> transitions) throws Exception {
     transitions
-        .withExternal()
-        .source(OrderStates.Idle).target(OrderStates.Created)
-        .event(OrderEvents.OrderCreated)
-        .and()
         .withExternal()
         .source(OrderStates.Created).target(OrderStates.Paid)
         .event(OrderEvents.OrderPaid)

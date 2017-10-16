@@ -7,5 +7,5 @@ public enum OrderStates {
   Paid,
   InDelivery,
   Received,
-  Idle, Confirmed
+  Confirmed
 }

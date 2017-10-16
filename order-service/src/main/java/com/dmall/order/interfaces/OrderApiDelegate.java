@@ -1,7 +1,7 @@
 package com.dmall.order.interfaces;
 
-import com.dmall.order.interfaces.dto.OrderRequest;
-import com.dmall.order.interfaces.dto.OrderResponse;
+import com.dmall.order.interfaces.dto.CreateOrderRequest;
+import com.dmall.order.interfaces.dto.CreateOrderResponse;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -9,13 +9,15 @@ import org.springframework.http.ResponseEntity;
  */
 public interface OrderApiDelegate {
 
-  ResponseEntity<OrderResponse> getAllOrders();
+  ResponseEntity<CreateOrderResponse> getAllOrders();
 
-  void createOrder(OrderRequest request);
+  void createOrder(CreateOrderRequest request);
 
   void notifyPaid(Integer oid, String payment_id, String payment_time);
 
   void notifyInDelivery(Integer oid, String shipping_id, String shipping_time);
 
   void notifyReceivd(Integer oid, Integer shipping_id, String receive_time);
+
+  void confirmOrder();
 }

@@ -16,7 +16,7 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderResponse {
+public class CreateOrderResponse {
   private Integer oid;
   private Integer uid;
   private BigDecimal total;

@@ -2,35 +2,34 @@ package com.dmall.order.interfaces.assembler;
 
 import com.dmall.order.domain.Order;
 import com.dmall.order.domain.OrderItem;
-import com.dmall.order.interfaces.dto.OrderRequest;
-import com.dmall.order.interfaces.dto.OrderResponse;
+import com.dmall.order.interfaces.dto.CreateOrderRequest;
+import com.dmall.order.interfaces.dto.CreateOrderResponse;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Created by azhu on 17/09/2017.
- */
+@Component
 public class OrderAssembler {
-  public OrderResponse toDTO(List<Order> orders) {
-    return new OrderResponse();
+  public CreateOrderResponse toDTO(List<Order> orders) {
+    return new CreateOrderResponse();
   }
 
-  public Order toDomainObject(OrderRequest request) {
-    return Order.builder()
-        .uid(request.getUid())
-        .total_price(request.getTotal_price())
-        .items(toOrderItemList(request.getItems()))
-        .build();
+  public Order toDomainObject(CreateOrderRequest request) {
+    final Order order = new Order();
+    order.setUid(request.getUid());
+    order.setTotal_price(request.getTotal_price());
+    order.setItems(toOrderItemList(request.getItems()));
+    return order;
   }
 
-  private List<OrderItem> toOrderItemList(List<OrderRequest.OrderItem> items) {
+  private List<OrderItem> toOrderItemList(List<CreateOrderRequest.OrderItem> items) {
     return items.stream()
         .map(this::toOrderItem)
         .collect(Collectors.toList());
   }
 
-  private OrderItem toOrderItem(OrderRequest.OrderItem orderItem) {
+  private OrderItem toOrderItem(CreateOrderRequest.OrderItem orderItem) {
     return OrderItem.builder()
         //.id(orderItem)
         //.oid(orderItem)
@@ -39,5 +38,9 @@ public class OrderAssembler {
         .price(orderItem.getPrice())
         .amount(orderItem.getAmount())
         .build();
+  }
+
+  public CreateOrderResponse toDTO(Order order) {
+    return null;
   }
 }

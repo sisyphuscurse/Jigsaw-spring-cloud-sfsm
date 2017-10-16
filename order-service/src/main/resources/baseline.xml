@@ -82,4 +82,9 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="add column to orders table" author="Leo">
+        <addColumn tableName="orders">
+            <column name="confirm_time" type="varchar(20)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
