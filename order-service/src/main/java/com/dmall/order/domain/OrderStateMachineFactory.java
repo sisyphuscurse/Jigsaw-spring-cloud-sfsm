@@ -8,8 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
 
-import static com.dmall.order.application.OrderService.ORDER_STATE_MACHINE;
-
 @Component
 public class OrderStateMachineFactory {
 
@@ -20,7 +18,7 @@ public class OrderStateMachineFactory {
       builder.configureConfiguration()
           .withConfiguration()
           .machineId(orderEntity.getOrderStateMachineId())
-          .listener(orderEntity)
+          .listener(orderEntity.listener())
           .beanFactory(new StaticListableBeanFactory());
 
       builder.configureStates()
@@ -59,7 +57,6 @@ public class OrderStateMachineFactory {
 
     return builder.build();
   }
-
 
 
 }

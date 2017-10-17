@@ -2,6 +2,7 @@ package com.dmall.order.application;
 
 import com.dmall.order.domain.Order;
 import com.dmall.order.domain.OrderEntity;
+import com.dmall.order.domain.OrderEvents;
 import com.dmall.order.domain.OrderStateMachineFactory;
 import com.dmall.order.infrastructure.repository.OrderItemJpaRepository;
 import com.dmall.order.infrastructure.repository.OrderJpaRepository;
@@ -12,6 +13,8 @@ import com.dmall.order.interfaces.dto.CreateOrderRequest;
 import com.dmall.order.interfaces.dto.CreateOrderResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +23,6 @@ import java.util.Objects;
 @Service
 @Transactional
 public class OrderService {
-
-  public static final String ORDER_STATE_MACHINE = "orderStateMachine";
 
   @Autowired
   private OrderAssembler orderAssembler;
@@ -50,27 +51,50 @@ public class OrderService {
   }
 
   public void notifyPaid(Integer oid, String payment_id, String payment_time) {
-    buildOrderEntity(oid).notifyPaid(payment_id, payment_time);
+
+    Message<OrderEvents> message = MessageBuilder
+        .withPayload(OrderEvents.OrderPaid)
+        .setHeader("payment_id", payment_id)
+        .setHeader("payment_time", payment_time)
+        .build();
+
+    final OrderEntity orderEntity = buildOrderEntity(oid);
+    orderEntity.sendEvent(message);
+  }
+
+
+  public void notifyInDelivery(Integer oid, String shipping_id, String shipping_time) {
+    Message<OrderEvents> message = MessageBuilder
+        .withPayload(OrderEvents.OrderShipped)
+        .setHeader("shipping_id", shipping_id)
+        .setHeader("shipping_time", shipping_time)
+        .build();
+
+    final OrderEntity orderEntity = buildOrderEntity(oid);
+    orderEntity.sendEvent(message);
+  }
+
+  public void notifyReceived(Integer oid, Integer shipping_id, String received_time) {
+    Message<OrderEvents> message = MessageBuilder
+        .withPayload(OrderEvents.OrderReceived)
+        .setHeader("shipping_id", shipping_id)
+        .setHeader("received_time", received_time)
+        .build();
+
+    final OrderEntity orderEntity = buildOrderEntity(oid);
+    orderEntity.sendEvent(message);
+  }
+
+  public void confirmOrder(Integer oid, String uid) {
+
+    final OrderEntity orderEntity = buildOrderEntity(oid);
+    orderEntity.sendEvent(OrderEvents.OrderConfirmed);
   }
 
   private OrderEntity buildOrderEntity(Integer oid) {
     final Order order = getOrderById(oid);
     return context.getBean(OrderEntity.class, order, orderStateMachineFactory, this);
   }
-
-
-  public void notifyInDelivery(Integer oid, String shipping_id, String shipping_time) {
-    buildOrderEntity(oid).notifyInDelivery(shipping_id, shipping_time);
-  }
-
-  public void notifyReceived(Integer oid, Integer shipping_id, String receive_time) {
-    buildOrderEntity(oid).notifyReceived(shipping_id, receive_time);
-  }
-
-  public void confirmOrder(Integer oid, String uid) {
-    buildOrderEntity(oid).confirm();
-  }
-
 
   public Order getOrderById(Integer oid) {
     Order order = repository.findOne(oid);
@@ -89,18 +113,18 @@ public class OrderService {
 
     Order savedOrder = repository.save(order);
 
-    if(Objects.nonNull(order.getItems())) {
+    if (Objects.nonNull(order.getItems())) {
       order.getItems().stream()
           .forEach(c -> c.setOid(savedOrder.getOid()));
 
       orderItemJpaRepository.save(order.getItems());
     }
 
-    if(Objects.nonNull(order.getPayment())) {
+    if (Objects.nonNull(order.getPayment())) {
       paymentJpaRepository.save(order.getPayment());
     }
 
-    if(Objects.nonNull(order.getShipment())) {
+    if (Objects.nonNull(order.getShipment())) {
       shipmentJpaRepository.save(order.getShipment());
     }
 

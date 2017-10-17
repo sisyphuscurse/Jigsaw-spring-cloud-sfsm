@@ -6,7 +6,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.access.StateMachineAccess;
 import org.springframework.statemachine.action.Action;
@@ -18,11 +17,11 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static com.dmall.order.application.OrderService.ORDER_STATE_MACHINE;
-
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-public class OrderEntity extends StateMachineListenerAdapter<OrderStates, OrderEvents> {
+public class OrderEntity {
+
+  public static final String ORDER_STATE_MACHINE = "orderStateMachine";
 
   private final Order order;
 
@@ -31,14 +30,6 @@ public class OrderEntity extends StateMachineListenerAdapter<OrderStates, OrderE
   private OrderStateMachineFactory factory;
 
   private OrderService orderService;
-
-  public OrderEntity(OrderStateMachineFactory factory, OrderService orderService) {
-    this.factory = factory;
-    this.orderService = orderService;
-    this.order = new Order();
-    this.order.setState(OrderStates.Created);
-    this.stateMachine = this.factory.build(this);
-  }
 
   public OrderEntity(Order order, OrderStateMachineFactory factory, OrderService orderService) {
     this.order = order;
@@ -61,50 +52,17 @@ public class OrderEntity extends StateMachineListenerAdapter<OrderStates, OrderE
     return ORDER_STATE_MACHINE + order.getOid();
   }
 
-  public void notifyPaid(String payment_id, String payment_time) {
-
-    Message<OrderEvents> message = MessageBuilder
-        .withPayload(OrderEvents.OrderPaid)
-        .setHeader("payment_id", payment_id)
-        .setHeader("payment_time", payment_time)
-        .build();
+  public void sendEvent(Message<OrderEvents> message) {
 
     stateMachine.sendEvent(message);
   }
 
+  public void sendEvent(OrderEvents events) {
 
-  public void notifyInDelivery(String shipping_id, String shipping_time) {
-    Message<OrderEvents> message = MessageBuilder
-        .withPayload(OrderEvents.OrderShipped)
-        .setHeader("shipping_id", shipping_id)
-        .setHeader("shipping_time", shipping_time)
-        .build();
-
-    stateMachine.sendEvent(message);
+    stateMachine.sendEvent(events);
   }
 
-  public void notifyReceived(Integer shipping_id, String received_time) {
-    Message<OrderEvents> message = MessageBuilder
-        .withPayload(OrderEvents.OrderReceived)
-        .setHeader("order", this)
-        .setHeader("shipping_id", shipping_id)
-        .setHeader("received_time", received_time)
-        .build();
 
-    stateMachine.sendEvent(message);
-  }
-
-  public void confirm() {
-
-    stateMachine.sendEvent(OrderEvents.OrderConfirmed);
-  }
-
-  @Override
-  public void stateChanged(State<OrderStates, OrderEvents> from, State<OrderStates, OrderEvents> to) {
-    order.setState(stateMachine.getState().getId());
-    orderService.save(order);
-    super.stateChanged(from, to);
-  }
 
   Action<OrderStates, OrderEvents> notifyPaidAction() {
     return context -> {
@@ -146,6 +104,17 @@ public class OrderEntity extends StateMachineListenerAdapter<OrderStates, OrderE
   Action<OrderStates, OrderEvents> cancelOrder() {
     return context -> {
 
+    };
+  }
+
+  StateMachineListenerAdapter<OrderStates, OrderEvents> listener() {
+    return new StateMachineListenerAdapter<OrderStates, OrderEvents>()  {
+      @Override
+      public void stateChanged(State<OrderStates, OrderEvents> from, State<OrderStates, OrderEvents> to) {
+        order.setState(stateMachine.getState().getId());
+        orderService.save(order);
+        super.stateChanged(from, to);
+      }
     };
   }
 }

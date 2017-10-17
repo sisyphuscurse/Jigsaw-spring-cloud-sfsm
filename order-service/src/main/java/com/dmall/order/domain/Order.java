@@ -59,13 +59,9 @@ public class Order {
 
 
   public Order() {
-    setOrderCreation();
-    this.setState(OrderStates.Created);
-  }
-
-  public void setOrderCreation() {
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     String current_datetime = format.format(new Date());
     this.setCreate_time(current_datetime);
+    this.setState(OrderStates.Created);
   }
 }
