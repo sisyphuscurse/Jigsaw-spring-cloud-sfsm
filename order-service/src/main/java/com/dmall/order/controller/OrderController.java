@@ -1,6 +1,6 @@
 package com.dmall.order.controller;
 
-import com.dmall.order.domain.OrderDAO;
+
 import com.dmall.order.application.OrderService;
 import com.dmall.order.interfaces.dto.CreateOrderRequest;
 import com.dmall.order.interfaces.dto.CreateOrderResponse;
@@ -21,9 +21,6 @@ public class OrderController {
 
   @Autowired
   private OrderService orderService;
-
-  @Autowired
-  private OrderDAO orderDAO;
 
   @Autowired
   public OrderController(OrderService orderService) {
@@ -74,7 +71,7 @@ public class OrderController {
 
   @RequestMapping(value = "orders/{oid}/set-paid", method = RequestMethod.POST, headers = "Accept=application/json")
   public void setPaid(@PathVariable("oid") Integer oid, String payment_id, String payment_time) {
-      orderService.notifyPaid(oid, payment_id, payment_time);
+    orderService.notifyPaid(oid, payment_id, payment_time);
   }
 
   @RequestMapping(value = "/orders/{oid}/deliver", method = RequestMethod.POST, headers = "Accept=application/json")
