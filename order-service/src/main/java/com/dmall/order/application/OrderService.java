@@ -4,10 +4,7 @@ import com.dmall.order.domain.Order;
 import com.dmall.order.domain.OrderEntity;
 import com.dmall.order.domain.OrderEvents;
 import com.dmall.order.domain.OrderStateMachineFactory;
-import com.dmall.order.infrastructure.repository.OrderItemJpaRepository;
-import com.dmall.order.infrastructure.repository.OrderJpaRepository;
-import com.dmall.order.infrastructure.repository.PaymentJpaRepository;
-import com.dmall.order.infrastructure.repository.ShipmentJpaRepository;
+import com.dmall.order.infrastructure.repository.OrderRepository;
 import com.dmall.order.interfaces.assembler.OrderAssembler;
 import com.dmall.order.interfaces.dto.CreateOrderRequest;
 import com.dmall.order.interfaces.dto.CreateOrderResponse;
@@ -17,8 +14,6 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Objects;
 
 @Service
 @Transactional
@@ -31,22 +26,14 @@ public class OrderService {
   private ApplicationContext context;
 
   @Autowired
-  private OrderJpaRepository repository;
+  private OrderRepository repository;
 
-  @Autowired
-  private OrderItemJpaRepository orderItemJpaRepository;
-
-  @Autowired
-  private PaymentJpaRepository paymentJpaRepository;
-
-  @Autowired
-  private ShipmentJpaRepository shipmentJpaRepository;
 
   @Autowired
   private OrderStateMachineFactory orderStateMachineFactory;
 
   public CreateOrderResponse createOrder(CreateOrderRequest orderRequest) {
-    final Order order = save(orderAssembler.toDomainObject(orderRequest));
+    final Order order = repository.save(orderAssembler.toDomainObject(orderRequest));
     return orderAssembler.toDTO(order);
   }
 
@@ -93,42 +80,11 @@ public class OrderService {
 
   private OrderEntity buildOrderEntity(Integer oid) {
     final Order order = getOrderById(oid);
-    return context.getBean(OrderEntity.class, order, orderStateMachineFactory, this);
+    return context.getBean(OrderEntity.class, order, orderStateMachineFactory, repository);
   }
 
   public Order getOrderById(Integer oid) {
-    Order order = repository.findOne(oid);
-
-    if (Objects.nonNull(order)) {
-      order.setPayment(paymentJpaRepository.findByOid(oid));
-      order.setShipment(shipmentJpaRepository.findByOid(oid));
-      order.setItems(orderItemJpaRepository.findByOid(oid));
-    }
-
-    return order;
-  }
-
-
-  public Order save(Order order) {
-
-    Order savedOrder = repository.save(order);
-
-    if (Objects.nonNull(order.getItems())) {
-      order.getItems().stream()
-          .forEach(c -> c.setOid(savedOrder.getOid()));
-
-      orderItemJpaRepository.save(order.getItems());
-    }
-
-    if (Objects.nonNull(order.getPayment())) {
-      paymentJpaRepository.save(order.getPayment());
-    }
-
-    if (Objects.nonNull(order.getShipment())) {
-      shipmentJpaRepository.save(order.getShipment());
-    }
-
-    return savedOrder;
+    return repository.getOrderById(oid);
   }
 
 }
