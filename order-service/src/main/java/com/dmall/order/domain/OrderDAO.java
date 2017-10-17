@@ -1,6 +1,5 @@
 package com.dmall.order.domain;
 
-import com.dmall.order.domain.Order;
 import com.dmall.order.infrastructure.repository.OrderItemJpaRepository;
 import com.dmall.order.infrastructure.repository.OrderJpaRepository;
 import com.dmall.order.infrastructure.repository.PaymentJpaRepository;
@@ -43,31 +42,26 @@ public class OrderDAO {
     return order;
   }
 
-  
+
   public Order save(Order order) {
 
     Order savedOrder = repository.save(order);
 
-    order.getItems().stream()
-        .forEach(c -> c.setOid(savedOrder.getOid()));
+    if(Objects.nonNull(order.getItems())) {
+      order.getItems().stream()
+          .forEach(c -> c.setOid(savedOrder.getOid()));
 
-    orderItemJpaRepository.save(order.getItems());
+      orderItemJpaRepository.save(order.getItems());
+    }
+
+    if(Objects.nonNull(order.getPayment())) {
+      paymentJpaRepository.save(order.getPayment());
+    }
+
+    if(Objects.nonNull(order.getShipment())) {
+      shipmentJpaRepository.save(order.getShipment());
+    }
 
     return savedOrder;
-  }
-
-  public void notifyPaid(Order order) {
-    repository.save(order);
-    paymentJpaRepository.save(order.getPayment());
-  }
-
-  public void notifyShipped(Order order) {
-    repository.save(order); //maybe is not necessary.
-    shipmentJpaRepository.save(order.getShipment());
-  }
-
-  public void notifyReceived(Order order) {
-    repository.save(order); //maybe is not necessary.
-    shipmentJpaRepository.save(order.getShipment());
   }
 }

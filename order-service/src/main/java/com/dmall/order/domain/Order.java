@@ -2,7 +2,6 @@
 package com.dmall.order.domain;
 
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.statemachine.StateMachine;
@@ -18,13 +17,11 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Getter
 @Setter
-@EqualsAndHashCode
 @Entity
 @Table(name = "orders")
 public class Order {
@@ -59,7 +56,6 @@ public class Order {
 
   @Transient
   private Shipment shipment;
-
 
 
   public Order() {

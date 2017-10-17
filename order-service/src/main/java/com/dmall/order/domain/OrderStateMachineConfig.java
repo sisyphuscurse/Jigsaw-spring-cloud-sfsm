@@ -10,46 +10,46 @@ import org.springframework.statemachine.config.builders.StateMachineTransitionCo
 
 import java.util.EnumSet;
 
-@Configuration
-@EnableStateMachineFactory
+//@Configuration
+//@EnableStateMachineFactory
 public class OrderStateMachineConfig extends EnumStateMachineConfigurerAdapter<OrderStates, OrderEvents> {
 
-  @Override
-  public void configure(StateMachineConfigurationConfigurer<OrderStates, OrderEvents> config) throws Exception {
-    config
-        .withConfiguration()
-        .machineId("orderStateMachine");
-  }
-
-  @Override
-  public void configure(StateMachineStateConfigurer<OrderStates, OrderEvents> states) throws Exception {
-    states
-        .withStates()
-        .initial(OrderStates.Created)
-        .states(EnumSet.allOf(OrderStates.class));
-  }
-
-  @Override
-  public void configure(StateMachineTransitionConfigurer<OrderStates, OrderEvents> transitions) throws Exception {
-    transitions
-        .withExternal()
-        .source(OrderStates.Created).target(OrderStates.Paid)
-        .event(OrderEvents.OrderPaid)
-        .and()
-        .withExternal()
-        .source(OrderStates.Paid).target(OrderStates.InDelivery)
-        .event(OrderEvents.OrderShipped)
-        .and()
-        .withExternal()
-        .source(OrderStates.InDelivery).target(OrderStates.Received)
-        .event(OrderEvents.OrderReceived)
-        .and()
-        .withExternal()
-        .source(OrderStates.Received).target(OrderStates.Confirmed)
-        .event(OrderEvents.OrderConfirmed)
-        .and()
-        .withExternal()
-        .source(OrderStates.Created).target(OrderStates.Cancelled)
-        .event(OrderEvents.OrderCancelled);
-  }
+//  @Override
+//  public void configure(StateMachineConfigurationConfigurer<OrderStates, OrderEvents> config) throws Exception {
+//    config
+//        .withConfiguration()
+//        .machineId("orderStateMachine");
+//  }
+//
+//  @Override
+//  public void configure(StateMachineStateConfigurer<OrderStates, OrderEvents> states) throws Exception {
+//    states
+//        .withStates()
+//        .initial(OrderStates.Created)
+//        .states(EnumSet.allOf(OrderStates.class));
+//  }
+//
+//  @Override
+//  public void configure(StateMachineTransitionConfigurer<OrderStates, OrderEvents> transitions) throws Exception {
+//    transitions
+//        .withExternal()
+//        .source(OrderStates.Created).target(OrderStates.Paid)
+//        .event(OrderEvents.OrderPaid)
+//        .and()
+//        .withExternal()
+//        .source(OrderStates.Paid).target(OrderStates.InDelivery)
+//        .event(OrderEvents.OrderShipped)
+//        .and()
+//        .withExternal()
+//        .source(OrderStates.InDelivery).target(OrderStates.Received)
+//        .event(OrderEvents.OrderReceived)
+//        .and()
+//        .withExternal()
+//        .source(OrderStates.Received).target(OrderStates.Confirmed)
+//        .event(OrderEvents.OrderConfirmed)
+//        .and()
+//        .withExternal()
+//        .source(OrderStates.Created).target(OrderStates.Cancelled)
+//        .event(OrderEvents.OrderCancelled);
+//  }
 }

@@ -2,14 +2,11 @@ package com.dmall.order.application;
 
 import com.dmall.order.domain.Order;
 import com.dmall.order.domain.OrderBeanFactory;
-import com.dmall.order.domain.OrderEvents;
 import com.dmall.order.domain.OrderDAO;
-import com.dmall.order.domain.OrderStates;
 import com.dmall.order.interfaces.assembler.OrderAssembler;
 import com.dmall.order.interfaces.dto.CreateOrderRequest;
 import com.dmall.order.interfaces.dto.CreateOrderResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,7 +25,7 @@ public class OrderService {
 
 
   @Autowired
-  public OrderService(StateMachineFactory<OrderStates, OrderEvents> factory, OrderDAO orderDAO) {
+  public OrderService(OrderDAO orderDAO) {
     this.orderDAO = orderDAO;
   }
 
