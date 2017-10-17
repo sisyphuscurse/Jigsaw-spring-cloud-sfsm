@@ -17,14 +17,14 @@ import java.util.EnumSet;
 @Component
 public class OrderStateMachineFactory {
 
-  public StateMachine<OrderStates, OrderEvents> buildAndStart(OrderEntity orderEntity) {
+  public StateMachine<OrderStates, OrderEvents> build(Order order) {
     StateMachineBuilder.Builder<OrderStates, OrderEvents> builder = StateMachineBuilder.builder();
 
     try {
       builder.configureConfiguration()
           .withConfiguration()
-          .machineId(orderEntity.getOrderStateMachineId())
-          .listener(listener(orderEntity))
+          .machineId(order.getOrderStateMachineId())
+          .listener(listener(order))
           .beanFactory(new StaticListableBeanFactory());
 
       builder.configureStates()
@@ -36,22 +36,22 @@ public class OrderStateMachineFactory {
           .withExternal()
           .source(OrderStates.Created).target(OrderStates.Paid)
           .event(OrderEvents.OrderPaid)
-          .action(notifyPaidAction(orderEntity))
+          .action(notifyPaidAction(order))
           .and()
           .withExternal()
           .source(OrderStates.Paid).target(OrderStates.InDelivery)
           .event(OrderEvents.OrderShipped)
-          .action(notifyShippedAction(orderEntity))
+          .action(notifyShippedAction(order))
           .and()
           .withExternal()
           .source(OrderStates.InDelivery).target(OrderStates.Received)
           .event(OrderEvents.OrderReceived)
-          .action(notifyReceivedAction(orderEntity))
+          .action(notifyReceivedAction(order))
           .and()
           .withExternal()
           .source(OrderStates.Received).target(OrderStates.Confirmed)
           .event(OrderEvents.OrderConfirmed)
-          .action(confirmOrder(orderEntity))
+          .action(confirmOrder(order))
           .and()
           .withExternal()
           .source(OrderStates.Created).target(OrderStates.Cancelled)
@@ -63,22 +63,20 @@ public class OrderStateMachineFactory {
 
     final StateMachine<OrderStates, OrderEvents> stateMachine = builder.build();
 
-    restoreStateMachine(stateMachine, orderEntity);
-
-    stateMachine.start();
+    restoreStateMachine(stateMachine, order);
 
     return stateMachine;
   }
 
-  private void restoreStateMachine(StateMachine<OrderStates, OrderEvents> stateMachine, OrderEntity entity) {
+  private void restoreStateMachine(StateMachine<OrderStates, OrderEvents> stateMachine, Order entity) {
     StateMachineAccess<OrderStates, OrderEvents> region = stateMachine.getStateMachineAccessor().withRegion();
-    final OrderStates state = entity.getOrderState();
+    final OrderStates state = entity.getState();
     final String machinedId = entity.getOrderStateMachineId();
     region.resetStateMachine(
         new DefaultStateMachineContext<>(state, null, null, null, null, machinedId));
   }
 
-  Action<OrderStates, OrderEvents> notifyPaidAction(OrderEntity entity) {
+  Action<OrderStates, OrderEvents> notifyPaidAction(Order entity) {
     return context -> {
       final MessageHeaders headers = context.getMessageHeaders();
       String payment_id = (String) headers.get("payment_id");
@@ -87,7 +85,7 @@ public class OrderStateMachineFactory {
     };
   }
 
-  Action<OrderStates, OrderEvents> notifyShippedAction(OrderEntity entity) {
+  Action<OrderStates, OrderEvents> notifyShippedAction(Order entity) {
 
     return context -> {
       final MessageHeaders headers = context.getMessageHeaders();
@@ -98,7 +96,7 @@ public class OrderStateMachineFactory {
     };
   }
 
-  Action<OrderStates, OrderEvents> notifyReceivedAction(OrderEntity entity) {
+  Action<OrderStates, OrderEvents> notifyReceivedAction(Order entity) {
 
     return context -> {
       final MessageHeaders headers = context.getMessageHeaders();
@@ -107,7 +105,7 @@ public class OrderStateMachineFactory {
     };
   }
 
-  Action<OrderStates, OrderEvents> confirmOrder(OrderEntity entity) {
+  Action<OrderStates, OrderEvents> confirmOrder(Order entity) {
     return context -> {
       entity.onConfirmed();
     };
@@ -120,7 +118,7 @@ public class OrderStateMachineFactory {
     };
   }
 
-  StateMachineListenerAdapter<OrderStates, OrderEvents> listener(OrderEntity entity) {
+  StateMachineListenerAdapter<OrderStates, OrderEvents> listener(Order entity) {
     return new StateMachineListenerAdapter<OrderStates, OrderEvents>() {
       @Override
       public void stateChanged(State<OrderStates, OrderEvents> from, State<OrderStates, OrderEvents> to) {
