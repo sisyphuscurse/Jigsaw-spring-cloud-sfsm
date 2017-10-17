@@ -6,7 +6,7 @@ import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OrderFactory {
+public class OrderEntityFactory {
 
   @Autowired
   private OrderStateMachineFactory orderStateMachineFactory;
@@ -15,13 +15,15 @@ public class OrderFactory {
   private IOrderRepository repository;
 
 
-  public Order build(Integer oid) {
+  public OrderEntity build(Integer oid) {
     final Order order = repository.getOrderById(oid);
 
-    final StateMachine<OrderStates, OrderEvents> stateMachine = orderStateMachineFactory.build(order);
+    final OrderEntity orderEntity = new OrderEntity(order);
 
-    order.initialize(stateMachine, repository);
+    final StateMachine<OrderStates, OrderEvents> stateMachine = orderStateMachineFactory.build(orderEntity);
 
-    return order;
+    orderEntity.initialize(stateMachine, repository);
+
+    return orderEntity;
   }
 }

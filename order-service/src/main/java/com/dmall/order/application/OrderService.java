@@ -2,8 +2,9 @@ package com.dmall.order.application;
 
 import com.dmall.order.domain.IOrderRepository;
 import com.dmall.order.domain.Order;
+import com.dmall.order.domain.OrderEntity;
+import com.dmall.order.domain.OrderEntityFactory;
 import com.dmall.order.domain.OrderEvents;
-import com.dmall.order.domain.OrderFactory;
 import com.dmall.order.infrastructure.repository.OrderItemRepository;
 import com.dmall.order.infrastructure.repository.OrderRepository;
 import com.dmall.order.infrastructure.repository.PaymentRepository;
@@ -38,7 +39,7 @@ public class OrderService implements IOrderRepository {
   private com.dmall.order.infrastructure.repository.ShipmentRepository ShipmentRepository;
 
   @Autowired
-  private OrderFactory orderFactory;
+  private OrderEntityFactory orderEntityFactory;
 
   public CreateOrderResponse createOrder(CreateOrderRequest orderRequest) {
     final Order order = repository.save(orderAssembler.toDomainObject(orderRequest));
@@ -53,7 +54,7 @@ public class OrderService implements IOrderRepository {
         .setHeader("payment_time", payment_time)
         .build();
 
-    final Order order = orderFactory.build(oid);
+    final OrderEntity order = orderEntityFactory.build(oid);
     order.sendEvent(message);
   }
 
@@ -64,7 +65,7 @@ public class OrderService implements IOrderRepository {
         .setHeader("shipping_time", shipping_time)
         .build();
 
-    final Order order = orderFactory.build(oid);
+    final OrderEntity order = orderEntityFactory.build(oid);
     order.sendEvent(message);
   }
 
@@ -75,13 +76,14 @@ public class OrderService implements IOrderRepository {
         .setHeader("received_time", received_time)
         .build();
 
-    final Order order = orderFactory.build(oid);
+    final OrderEntity order = orderEntityFactory.build(oid);
+
     order.sendEvent(message);
   }
 
   public void confirmOrder(Integer oid, String uid) {
 
-    final Order order = orderFactory.build(oid);
+    final OrderEntity order = orderEntityFactory.build(oid);
     order.sendEvent(OrderEvents.OrderConfirmed);
   }
 
