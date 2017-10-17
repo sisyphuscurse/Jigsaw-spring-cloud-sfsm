@@ -1,10 +1,12 @@
 package com.dmall.order.application;
 
+import com.dmall.order.domain.IOrderRepository;
 import com.dmall.order.domain.Order;
-import com.dmall.order.domain.Order;
-import com.dmall.order.domain.OrderFactory;
 import com.dmall.order.domain.OrderEvents;
+import com.dmall.order.domain.OrderFactory;
+import com.dmall.order.infrastructure.repository.OrderItemRepository;
 import com.dmall.order.infrastructure.repository.OrderRepository;
+import com.dmall.order.infrastructure.repository.PaymentRepository;
 import com.dmall.order.interfaces.assembler.OrderAssembler;
 import com.dmall.order.interfaces.dto.CreateOrderRequest;
 import com.dmall.order.interfaces.dto.CreateOrderResponse;
@@ -14,15 +16,26 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @Transactional
-public class OrderService {
+public class OrderService implements IOrderRepository {
 
   @Autowired
   private OrderAssembler orderAssembler;
 
   @Autowired
   private OrderRepository repository;
+
+  @Autowired
+  private OrderItemRepository orderItemRepository;
+
+  @Autowired
+  private PaymentRepository paymentRepository;
+
+  @Autowired
+  private com.dmall.order.infrastructure.repository.ShipmentRepository ShipmentRepository;
 
   @Autowired
   private OrderFactory orderFactory;
@@ -74,7 +87,36 @@ public class OrderService {
 
 
   public Order getOrderById(Integer oid) {
-    return repository.getOrderById(oid);
+    Order order = repository.findOne(oid);
+
+    if (Objects.nonNull(order)) {
+      order.setPayment(paymentRepository.findByOid(oid));
+      order.setShipment(ShipmentRepository.findByOid(oid));
+      order.setItems(orderItemRepository.findByOid(oid));
+    }
+
+    return order;
   }
 
+  public Order save(Order order) {
+
+    Order savedOrder = repository.save(order);
+
+    if (Objects.nonNull(order.getItems())) {
+      order.getItems().stream()
+          .forEach(c -> c.setOid(savedOrder.getOid()));
+
+      orderItemRepository.save(order.getItems());
+    }
+
+    if (Objects.nonNull(order.getPayment())) {
+      paymentRepository.save(order.getPayment());
+    }
+
+    if (Objects.nonNull(order.getShipment())) {
+      ShipmentRepository.save(order.getShipment());
+    }
+
+    return savedOrder;
+  }
 }

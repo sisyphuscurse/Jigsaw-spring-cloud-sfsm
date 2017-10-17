@@ -1,7 +1,6 @@
 package com.dmall.order.domain;
 
 
-import com.dmall.order.infrastructure.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Component;
@@ -13,7 +12,7 @@ public class OrderFactory {
   private OrderStateMachineFactory orderStateMachineFactory;
 
   @Autowired
-  private OrderRepository repository;
+  private IOrderRepository repository;
 
 
   public Order build(Integer oid) {

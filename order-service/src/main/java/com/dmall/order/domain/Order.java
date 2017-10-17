@@ -2,7 +2,6 @@
 package com.dmall.order.domain;
 
 
-import com.dmall.order.infrastructure.repository.OrderRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -67,7 +66,7 @@ public class Order {
   @Getter(AccessLevel.NONE)
   @Setter(AccessLevel.NONE)
   @Transient
-  private OrderRepository repository;
+  private IOrderRepository repository;
 
   public Order() {
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -76,7 +75,7 @@ public class Order {
     this.setState(OrderStates.Created);
   }
 
-  public void initialize(StateMachine<OrderStates, OrderEvents> stateMachine, OrderRepository repository) {
+  public void initialize(StateMachine<OrderStates, OrderEvents> stateMachine, IOrderRepository repository) {
     this.stateMachine = stateMachine;
     this.repository = repository;
 
