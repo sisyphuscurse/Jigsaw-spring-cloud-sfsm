@@ -90,11 +90,10 @@ public class OrderEntity {
     repository.save(order);
   }
 
-  void onError(StateContext<OrderStates, OrderEvents> context) {
-    final Exception exception = context.getException();
+  void onError(Exception exception) {
     // TODO: 18/10/2017 The exception can't be fetch in orderEntity, Using ExtendedState save exception.
     stateMachine.getExtendedState().getVariables().put("ERROR", exception);
-    context.getStateMachine().setStateMachineError(exception);
+    stateMachine.setStateMachineError(exception);
   }
 
   public OrderStates getOrderState() {
