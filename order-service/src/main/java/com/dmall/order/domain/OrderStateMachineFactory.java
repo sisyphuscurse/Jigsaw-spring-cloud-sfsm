@@ -36,27 +36,27 @@ public class OrderStateMachineFactory {
           .withExternal()
           .source(OrderStates.Created).target(OrderStates.Paid)
           .event(OrderEvents.OrderPaid)
-          .action(notifyPaidAction(orderEntity), context -> orderEntity.handleError(context))
+          .action(notifyPaidAction(orderEntity), context -> orderEntity.onError(context))
           .and()
           .withExternal()
           .source(OrderStates.Paid).target(OrderStates.InDelivery)
           .event(OrderEvents.OrderShipped)
-          .action(notifyShippedAction(orderEntity), context -> orderEntity.handleError(context))
+          .action(notifyShippedAction(orderEntity), context -> orderEntity.onError(context))
           .and()
           .withExternal()
           .source(OrderStates.InDelivery).target(OrderStates.Received)
           .event(OrderEvents.OrderReceived)
-          .action(notifyReceivedAction(orderEntity), context -> orderEntity.handleError(context))
+          .action(notifyReceivedAction(orderEntity), context -> orderEntity.onError(context))
           .and()
           .withExternal()
           .source(OrderStates.Received).target(OrderStates.Confirmed)
           .event(OrderEvents.OrderConfirmed)
-          .action(confirmOrder(orderEntity), context -> orderEntity.handleError(context))
+          .action(confirmOrder(orderEntity), context -> orderEntity.onError(context))
           .and()
           .withExternal()
           .source(OrderStates.Created).target(OrderStates.Cancelled)
           .event(OrderEvents.OrderCancelled)
-          .action(cancelOrder(), context -> orderEntity.handleError(context));
+          .action(cancelOrder(), context -> orderEntity.onError(context));
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -128,7 +128,7 @@ public class OrderStateMachineFactory {
 
       @Override
       public void stateMachineError(StateMachine<OrderStates, OrderEvents> stateMachine, Exception exception) {
-        stateMachine.getExtendedState().getVariables().put("ERROR", exception);
+
       }
     };
   }
