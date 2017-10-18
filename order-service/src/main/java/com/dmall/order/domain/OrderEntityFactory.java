@@ -18,11 +18,11 @@ public class OrderEntityFactory {
   public OrderEntity build(Integer oid) {
     final Order order = repository.getOrderById(oid);
 
-    final OrderEntity orderEntity = new OrderEntity(order);
+    final OrderEntity orderEntity = new OrderEntity(order, repository);
 
     final StateMachine<OrderStates, OrderEvents> stateMachine = orderStateMachineFactory.build(orderEntity);
 
-    orderEntity.initialize(stateMachine, repository);
+    orderEntity.initialize(stateMachine);
 
     return orderEntity;
   }

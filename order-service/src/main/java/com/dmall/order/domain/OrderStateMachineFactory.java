@@ -36,39 +36,39 @@ public class OrderStateMachineFactory {
           .withExternal()
           .source(OrderStates.Created).target(OrderStates.Paid)
           .event(OrderEvents.OrderPaid)
-          .action(notifyPaidAction(orderEntity))
+          .action(notifyPaidAction(orderEntity), context -> orderEntity.handleError(context))
           .and()
           .withExternal()
           .source(OrderStates.Paid).target(OrderStates.InDelivery)
           .event(OrderEvents.OrderShipped)
-          .action(notifyShippedAction(orderEntity))
+          .action(notifyShippedAction(orderEntity), context -> orderEntity.handleError(context))
           .and()
           .withExternal()
           .source(OrderStates.InDelivery).target(OrderStates.Received)
           .event(OrderEvents.OrderReceived)
-          .action(notifyReceivedAction(orderEntity))
+          .action(notifyReceivedAction(orderEntity), context -> orderEntity.handleError(context))
           .and()
           .withExternal()
           .source(OrderStates.Received).target(OrderStates.Confirmed)
           .event(OrderEvents.OrderConfirmed)
-          .action(confirmOrder(orderEntity))
+          .action(confirmOrder(orderEntity), context -> orderEntity.handleError(context))
           .and()
           .withExternal()
           .source(OrderStates.Created).target(OrderStates.Cancelled)
           .event(OrderEvents.OrderCancelled)
-          .action(cancelOrder());
+          .action(cancelOrder(), context -> orderEntity.handleError(context));
     } catch (Exception ex) {
       ex.printStackTrace();
     }
 
     final StateMachine<OrderStates, OrderEvents> stateMachine = builder.build();
 
-    restoreStateMachine(stateMachine, orderEntity);
+    initialize(stateMachine, orderEntity);
 
     return stateMachine;
   }
 
-  private void restoreStateMachine(StateMachine<OrderStates, OrderEvents> stateMachine, OrderEntity entity) {
+  private void initialize(StateMachine<OrderStates, OrderEvents> stateMachine, OrderEntity entity) {
     StateMachineAccess<OrderStates, OrderEvents> region = stateMachine.getStateMachineAccessor().withRegion();
     final OrderStates state = entity.getOrderState();
     final String machinedId = entity.getOrderStateMachineId();
@@ -124,6 +124,11 @@ public class OrderStateMachineFactory {
       public void stateChanged(State<OrderStates, OrderEvents> from, State<OrderStates, OrderEvents> to) {
         entity.onStateChanged();
         super.stateChanged(from, to);
+      }
+
+      @Override
+      public void stateMachineError(StateMachine<OrderStates, OrderEvents> stateMachine, Exception exception) {
+        stateMachine.getExtendedState().getVariables().put("ERROR", exception);
       }
     };
   }

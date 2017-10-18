@@ -5,11 +5,11 @@ package com.dmall.order.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.dao.DataAccessException;
 import org.springframework.messaging.Message;
+import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.StateMachine;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,14 +30,14 @@ public class OrderEntity {
   @Transient
   private IOrderRepository repository;
 
-  public OrderEntity(Order order) {
+  public OrderEntity(Order order, IOrderRepository repository) {
     this.order = order;
+    this.repository = repository;
   }
 
-  public void initialize(StateMachine<OrderStates, OrderEvents> stateMachine, IOrderRepository repository) {
+  // TODO: 18/10/2017 [BOILDER PLATE] This method should be refectory
+  public void initialize(StateMachine<OrderStates, OrderEvents> stateMachine) {
     this.stateMachine = stateMachine;
-    this.repository = repository;
-
     this.stateMachine.start();
   }
 
@@ -47,11 +47,25 @@ public class OrderEntity {
   }
 
   public void sendEvent(Message<OrderEvents> message) {
-    stateMachine.sendEvent(message);
+    exceptionHandler(stateMachine.sendEvent(message));
   }
 
   public void sendEvent(OrderEvents events) {
-    stateMachine.sendEvent(events);
+    exceptionHandler(stateMachine.sendEvent(events));
+  }
+
+  private void exceptionHandler(boolean succeed) {
+    if (!succeed) {
+      throw new RuntimeException("The event cannot be matched.");
+    } else if (stateMachine.hasStateMachineError()) {
+      RuntimeException exception = (RuntimeException) stateMachine.getExtendedState().getVariables().get("ERROR");
+
+      if(exception instanceof OrderDomainException) {
+        // TODO: 18/10/2017 recognize or handler exception
+      }
+
+      throw exception;
+    }
   }
 
   void onPaid(String payment_id, String payment_time) {
@@ -76,7 +90,12 @@ public class OrderEntity {
     repository.save(order);
   }
 
+  void handleError(StateContext<OrderStates, OrderEvents> context) {
+    Exception exception = context.getException();
+    context.getStateMachine().setStateMachineError(exception);
+  }
+
   public OrderStates getOrderState() {
-      return order.getState();
+    return order.getState();
   }
 }

@@ -8,10 +8,11 @@ import com.dmall.order.domain.OrderEvents;
 import com.dmall.order.infrastructure.repository.OrderItemRepository;
 import com.dmall.order.infrastructure.repository.OrderRepository;
 import com.dmall.order.infrastructure.repository.PaymentRepository;
-import com.dmall.order.interfaces.assembler.OrderAssembler;
+import com.dmall.order.interfaces.mapper.OrderMapper;
 import com.dmall.order.interfaces.dto.CreateOrderRequest;
 import com.dmall.order.interfaces.dto.CreateOrderResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ import java.util.Objects;
 public class OrderService implements IOrderRepository {
 
   @Autowired
-  private OrderAssembler orderAssembler;
+  private OrderMapper orderMapper;
 
   @Autowired
   private OrderRepository repository;
@@ -42,8 +43,8 @@ public class OrderService implements IOrderRepository {
   private OrderEntityFactory orderEntityFactory;
 
   public CreateOrderResponse createOrder(CreateOrderRequest orderRequest) {
-    final Order order = repository.save(orderAssembler.toDomainObject(orderRequest));
-    return orderAssembler.toDTO(order);
+    final Order order = repository.save(orderMapper.fromApi(orderRequest));
+    return orderMapper.toApi(order);
   }
 
   public void notifyPaid(Integer oid, String payment_id, String payment_time) {
