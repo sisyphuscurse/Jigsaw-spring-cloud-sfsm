@@ -6,7 +6,6 @@ import com.dmall.order.domain.OrderStates;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
@@ -29,7 +28,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @Table(name = "orders")
-public class OrderDto {
+public class OrderDTO {
 
   public static final String ORDER_STATE_MACHINE = "orderStateMachine";
 
@@ -53,18 +52,18 @@ public class OrderDto {
   private String confirm_time;
 
   @Transient
-  private OrderCancellationDto orderCancellation;
+  private OrderCancellationDTO orderCancellation;
 
   @Transient
-  private List<OrderItemDto> items;
+  private List<OrderItemDTO> items;
 
   @Transient
-  private PaymentDto payment;
+  private PaymentDTO payment;
 
   @Transient
-  private ShipmentDto shipment;
+  private ShipmentDTO shipment;
 
-  public OrderDto() {
+  public OrderDTO() {
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     String current_datetime = format.format(new Date());
     this.setCreate_time(current_datetime);

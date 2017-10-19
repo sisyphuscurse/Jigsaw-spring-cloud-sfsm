@@ -1,10 +1,10 @@
 package com.dmall.order.infrastructure.repository;
 
-import com.dmall.order.dto.OrderDto;
+import com.dmall.order.dto.OrderDTO;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
-public interface OrderRepository extends CrudRepository<OrderDto, Integer> {
+public interface OrderRepository extends CrudRepository<OrderDTO, Integer> {
 
 }

@@ -6,7 +6,7 @@ import com.dmall.order.domain.OrderEntity;
 import com.dmall.order.domain.OrderEntityFactory;
 import com.dmall.order.domain.OrderEvents;
 import com.dmall.order.domain.Order;
-import com.dmall.order.dto.OrderDto;
+import com.dmall.order.dto.OrderDTO;
 import com.dmall.order.infrastructure.repository.OrderCancellationRepository;
 import com.dmall.order.infrastructure.repository.OrderItemRepository;
 import com.dmall.order.infrastructure.repository.OrderRepository;
@@ -45,8 +45,8 @@ public class OrderService implements IOrderRepository {
   @Autowired
   private OrderMapper orderMapper;
 
-  public OrderDto createOrder(OrderDto orderDto) {
-    return save(orderDto);
+  public OrderDTO createOrder(OrderDTO orderDTO) {
+    return save(orderDTO);
   }
 
   public void notifyPaid(Integer oid, String payment_id, String payment_time) {
@@ -109,48 +109,48 @@ public class OrderService implements IOrderRepository {
   }
 
   public Order getOrderById(Integer oid) {
-    OrderDto orderDto = repository.findOne(oid);
+    OrderDTO orderDTO = repository.findOne(oid);
 
-    if (Objects.nonNull(orderDto)) {
-      orderDto.setPayment(paymentRepository.findByOid(oid));
-      orderDto.setShipment(shipmentRepository.findByOid(oid));
-      orderDto.setItems(orderItemRepository.findByOid(oid));
-      orderDto.setOrderCancellation(orderCancellationRepository.findByOid(oid));
+    if (Objects.nonNull(orderDTO)) {
+      orderDTO.setPayment(paymentRepository.findByOid(oid));
+      orderDTO.setShipment(shipmentRepository.findByOid(oid));
+      orderDTO.setItems(orderItemRepository.findByOid(oid));
+      orderDTO.setOrderCancellation(orderCancellationRepository.findByOid(oid));
     }
 
-    return orderMapper.fromDto(orderDto);
+    return orderMapper.fromDto(orderDTO);
   }
 
   public Order save(Order order) {
 
-    final OrderDto orderDto = orderMapper.toDto(order);
+    final OrderDTO orderDTO = orderMapper.toDto(order);
 
-    return orderMapper.fromDto(save(orderDto));
+    return orderMapper.fromDto(save(orderDTO));
   }
 
-  private OrderDto save(OrderDto orderDto) {
+  private OrderDTO save(OrderDTO orderDTO) {
 
-    OrderDto savedOrder = repository.save(orderDto);
+    OrderDTO savedOrder = repository.save(orderDTO);
 
-    if (Objects.nonNull(orderDto.getItems())) {
-      orderDto.getItems().stream()
+    if (Objects.nonNull(orderDTO.getItems())) {
+      orderDTO.getItems().stream()
           .forEach(c -> c.setOid(savedOrder.getOid()));
 
-      orderItemRepository.save(orderDto.getItems());
+      orderItemRepository.save(orderDTO.getItems());
     }
 
-    if (Objects.nonNull(orderDto.getPayment())) {
-      paymentRepository.save(orderDto.getPayment());
+    if (Objects.nonNull(orderDTO.getPayment())) {
+      paymentRepository.save(orderDTO.getPayment());
     }
 
-    if (Objects.nonNull(orderDto.getShipment())) {
-      shipmentRepository.save(orderDto.getShipment());
+    if (Objects.nonNull(orderDTO.getShipment())) {
+      shipmentRepository.save(orderDTO.getShipment());
     }
 
-    if (Objects.nonNull(orderDto.getOrderCancellation())) {
-      orderCancellationRepository.save(orderDto.getOrderCancellation());
+    if (Objects.nonNull(orderDTO.getOrderCancellation())) {
+      orderCancellationRepository.save(orderDTO.getOrderCancellation());
     }
 
-    return orderDto;
+    return orderDTO;
   }
 }

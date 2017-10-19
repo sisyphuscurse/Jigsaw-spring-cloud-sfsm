@@ -24,7 +24,7 @@ import javax.persistence.Table;
 @Slf4j
 @Entity
 @Table(name = "shipments")
-public class ShipmentDto {
+public class ShipmentDTO {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;

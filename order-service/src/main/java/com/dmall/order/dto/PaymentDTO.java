@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,13 +20,17 @@ import javax.persistence.Table;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
 @Entity
-@Table(name = "order_cancellation")
-public class OrderCancellationDto {
+@Table(name = "payments")
+public class PaymentDTO {
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;
+
+  private String payment_id;
+
   private Integer oid;
-  private String created_time;
-  private String reason;
+  private String payment_time;
 }

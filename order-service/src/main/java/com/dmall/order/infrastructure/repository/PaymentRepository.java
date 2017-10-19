@@ -1,12 +1,12 @@
 package com.dmall.order.infrastructure.repository;
 
-import com.dmall.order.dto.PaymentDto;
+import com.dmall.order.dto.PaymentDTO;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
-public interface PaymentRepository extends CrudRepository<PaymentDto, Integer> {
+public interface PaymentRepository extends CrudRepository<PaymentDTO, Integer> {
 
-  PaymentDto findByOid(Integer oid);
+  PaymentDTO findByOid(Integer oid);
 
 }

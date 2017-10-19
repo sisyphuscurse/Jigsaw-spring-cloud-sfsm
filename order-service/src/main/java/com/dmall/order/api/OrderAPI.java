@@ -5,7 +5,7 @@ import com.dmall.order.api.mapper.OrderDtoMapper;
 import com.dmall.order.api.request.CreateOrderRequest;
 import com.dmall.order.api.response.OrderResponse;
 import com.dmall.order.application.OrderService;
-import com.dmall.order.dto.OrderDto;
+import com.dmall.order.dto.OrderDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/")
-public class OrderApi {
+public class OrderAPI {
 
   @Autowired
   private OrderDtoMapper orderDtoMapper;
@@ -24,13 +24,13 @@ public class OrderApi {
   private OrderService orderService;
 
   @Autowired
-  public OrderApi(OrderService orderService) {
+  public OrderAPI(OrderService orderService) {
     this.orderService = orderService;
   }
 
   @RequestMapping(value = "orders", method = RequestMethod.POST, headers = "Accept=application/json")
   public OrderResponse create_new_order(CreateOrderRequest request) {
-    final OrderDto order = orderService.createOrder(orderDtoMapper.fromApi(request));
+    final OrderDTO order = orderService.createOrder(orderDtoMapper.fromApi(request));
     return orderDtoMapper.toApi(order);
   }
 

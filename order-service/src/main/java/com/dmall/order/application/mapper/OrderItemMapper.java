@@ -1,7 +1,7 @@
 package com.dmall.order.application.mapper;
 
 import com.dmall.order.domain.OrderItem;
-import com.dmall.order.dto.OrderItemDto;
+import com.dmall.order.dto.OrderItemDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -10,13 +10,13 @@ import java.util.stream.Collectors;
 @Component
 public class OrderItemMapper {
 
-  public List<OrderItem> fromDto(List<OrderItemDto> items) {
+  public List<OrderItem> fromDto(List<OrderItemDTO> items) {
     return items.stream()
         .map(this::fromDto)
         .collect(Collectors.toList());
   }
 
-  public OrderItem fromDto(OrderItemDto orderItem) {
+  public OrderItem fromDto(OrderItemDTO orderItem) {
     return OrderItem.builder()
         //.id(orderItem)
         //.oid(orderItem)
@@ -27,14 +27,14 @@ public class OrderItemMapper {
         .build();
   }
 
-  public List<OrderItemDto> toDto(List<OrderItem> items) {
+  public List<OrderItemDTO> toDto(List<OrderItem> items) {
     return items.stream()
         .map(this::toDto)
         .collect(Collectors.toList());
   }
 
-  public OrderItemDto toDto(OrderItem orderItem) {
-    return OrderItemDto.builder()
+  public OrderItemDTO toDto(OrderItem orderItem) {
+    return OrderItemDTO.builder()
         //.id(orderItem)
         //.oid(orderItem)
         .pid(orderItem.getPid())

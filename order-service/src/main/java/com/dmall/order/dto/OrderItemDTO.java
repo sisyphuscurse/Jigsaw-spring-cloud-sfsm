@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "order_items")
 @Builder
-public class OrderItemDto {
+public class OrderItemDTO {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;

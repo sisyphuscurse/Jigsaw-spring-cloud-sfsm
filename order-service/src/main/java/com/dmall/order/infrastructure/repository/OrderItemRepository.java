@@ -1,13 +1,13 @@
 package com.dmall.order.infrastructure.repository;
 
-import com.dmall.order.dto.OrderItemDto;
+import com.dmall.order.dto.OrderItemDTO;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Transactional
-public interface OrderItemRepository extends CrudRepository<OrderItemDto, Integer> {
+public interface OrderItemRepository extends CrudRepository<OrderItemDTO, Integer> {
 
-  List<OrderItemDto> findByOid(Integer oid);
+  List<OrderItemDTO> findByOid(Integer oid);
 }

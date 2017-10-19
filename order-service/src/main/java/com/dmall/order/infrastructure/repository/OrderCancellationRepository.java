@@ -1,9 +1,9 @@
 package com.dmall.order.infrastructure.repository;
 
 
-import com.dmall.order.dto.OrderCancellationDto;
+import com.dmall.order.dto.OrderCancellationDTO;
 import org.springframework.data.repository.CrudRepository;
 
-public interface OrderCancellationRepository extends CrudRepository<OrderCancellationDto, Integer> {
-  OrderCancellationDto findByOid(Integer oid);
+public interface OrderCancellationRepository extends CrudRepository<OrderCancellationDTO, Integer> {
+  OrderCancellationDTO findByOid(Integer oid);
 }

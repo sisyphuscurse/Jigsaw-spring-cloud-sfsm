@@ -1,7 +1,7 @@
 package com.dmall.order.application.mapper;
 
 import com.dmall.order.domain.Order;
-import com.dmall.order.dto.OrderDto;
+import com.dmall.order.dto.OrderDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,21 +14,21 @@ public class OrderMapper {
   @Autowired
   private OrderItemMapper orderItemMapper;
 
-  public Order fromDto(OrderDto orderDto) {
+  public Order fromDto(OrderDTO orderDTO) {
 
-    return modelMapper.map(orderDto, Order.class);
+    return modelMapper.map(orderDTO, Order.class);
 //
 //    final Order order = new Order();
-//    order.setUid(orderDto.getUid());
-//    order.setTotal_price(orderDto.getTotal_price());
-//    order.setItems(orderItemMapper.fromDto(orderDto.getItems()));
+//    order.setUid(orderDTO.getUid());
+//    order.setTotal_price(orderDTO.getTotal_price());
+//    order.setItems(orderItemMapper.fromDto(orderDTO.getItems()));
 //    return order;
   }
 
-  public OrderDto toDto(Order order) {
+  public OrderDTO toDto(Order order) {
 
-    return modelMapper.map(order, OrderDto.class);
-//    return OrderDto.builder()
+    return modelMapper.map(order, OrderDTO.class);
+//    return OrderDTO.builder()
 //        .oid(order.getOid())
 //        .total_price(order.getTotal_price())
 //        .items(orderItemMapper.toDto(order.getItems()))
