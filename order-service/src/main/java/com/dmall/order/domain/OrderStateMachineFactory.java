@@ -56,7 +56,7 @@ public class OrderStateMachineFactory {
           .withExternal()
           .source(OrderStates.Created).target(OrderStates.Cancelled)
           .event(OrderEvents.OrderCancelled)
-          .action(cancelOrder(), handleError(orderEntity));
+          .action(cancelOrder(orderEntity), handleError(orderEntity));
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -116,9 +116,11 @@ public class OrderStateMachineFactory {
   }
 
 
-  Action<OrderStates, OrderEvents> cancelOrder() {
+  Action<OrderStates, OrderEvents> cancelOrder(OrderEntity entity) {
     return context -> {
-
+      final MessageHeaders headers = context.getMessageHeaders();
+      String reason = (String) headers.get("reason");
+      entity.onCancelled(reason);
     };
   }
 

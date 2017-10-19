@@ -2,11 +2,8 @@
 package com.dmall.order.domain;
 
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.messaging.Message;
-import org.springframework.statemachine.StateMachine;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -48,6 +45,9 @@ public class Order {
 
   @Column(nullable = false)
   private String confirm_time;
+
+  @Transient
+  private OrderCancellation orderCancellation;
 
   @Transient
   private List<OrderItem> items;

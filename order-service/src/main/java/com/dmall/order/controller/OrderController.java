@@ -20,6 +20,7 @@ import java.util.List;
 public class OrderController {
 
   @Autowired
+  // TODO: 19/10/2017 Controller uses OrderService is just a temporary design.
   private OrderService orderService;
 
   @Autowired
@@ -90,8 +91,8 @@ public class OrderController {
   }
 
   @RequestMapping(value = "/orders/{oid}/cancel", method = RequestMethod.POST, headers = "Accept=application/json")
-  public void cancel(@PathVariable("oid") Integer oid, String uid, String reason) {
-
+  public void cancel(@PathVariable("oid") Integer oid, Integer uid, String reason) {
+    orderService.cancelOrder(oid, uid, reason);
   }
 }
 

@@ -2,15 +2,9 @@
 package com.dmall.order.domain;
 
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.dao.DataAccessException;
 import org.springframework.messaging.Message;
-import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.StateMachine;
 
-import javax.persistence.Transient;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -20,15 +14,10 @@ public class OrderEntity {
 
   private Order order;
 
-  @Getter(AccessLevel.NONE)
-  @Setter(AccessLevel.NONE)
-  @Transient
   private StateMachine<OrderStates, OrderEvents> stateMachine;
 
-  @Getter(AccessLevel.NONE)
-  @Setter(AccessLevel.NONE)
-  @Transient
   private IOrderRepository repository;
+  private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
   public OrderEntity(Order order, IOrderRepository repository) {
     this.order = order;
@@ -60,7 +49,7 @@ public class OrderEntity {
     } else if (stateMachine.hasStateMachineError()) {
       RuntimeException exception = (RuntimeException) stateMachine.getExtendedState().getVariables().get("ERROR");
 
-      if(exception instanceof OrderDomainException) {
+      if (exception instanceof OrderDomainException) {
         // TODO: 18/10/2017 recognize or handler exception
       }
 
@@ -81,8 +70,7 @@ public class OrderEntity {
   }
 
   void onConfirmed() {
-    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-    order.setConfirm_time(format.format(new Date()));
+    order.setConfirm_time(simpleDateFormat.format(new Date()));
   }
 
   void onStateChanged() {
@@ -98,5 +86,19 @@ public class OrderEntity {
 
   public OrderStates getOrderState() {
     return order.getState();
+  }
+
+  public void onCancelled(String reason) {
+    OrderCancellation orderCancellation = OrderCancellation.builder()
+        .oid(this.order.getOid())
+        .created_time(simpleDateFormat.format(new Date()))
+        .reason(reason)
+        .build();
+
+    order.setOrderCancellation(orderCancellation);
+  }
+
+  public Order getOrder() {
+    return order;
   }
 }

@@ -87,4 +87,22 @@
             <column name="confirm_time" type="varchar(20)"/>
         </addColumn>
     </changeSet>
+
+    <changeSet id="create order_cancellation table" author="Leo">
+        <createTable tableName="order_cancellation">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="oid" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reason" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_time" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

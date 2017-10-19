@@ -5,14 +5,15 @@ import com.dmall.order.domain.Order;
 import com.dmall.order.domain.OrderEntity;
 import com.dmall.order.domain.OrderEntityFactory;
 import com.dmall.order.domain.OrderEvents;
+import com.dmall.order.infrastructure.repository.OrderCancellationRepository;
 import com.dmall.order.infrastructure.repository.OrderItemRepository;
 import com.dmall.order.infrastructure.repository.OrderRepository;
 import com.dmall.order.infrastructure.repository.PaymentRepository;
-import com.dmall.order.interfaces.mapper.OrderMapper;
+import com.dmall.order.infrastructure.repository.ShipmentRepository;
 import com.dmall.order.interfaces.dto.CreateOrderRequest;
 import com.dmall.order.interfaces.dto.CreateOrderResponse;
+import com.dmall.order.interfaces.mapper.OrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.Objects;
 
 @Service
 @Transactional
+// TODO: 19/10/2017 OrderService is a domain service, it implements IOrderRepository is reasonable.
 public class OrderService implements IOrderRepository {
 
   @Autowired
@@ -37,10 +39,13 @@ public class OrderService implements IOrderRepository {
   private PaymentRepository paymentRepository;
 
   @Autowired
-  private com.dmall.order.infrastructure.repository.ShipmentRepository ShipmentRepository;
+  private ShipmentRepository shipmentRepository;
 
   @Autowired
   private OrderEntityFactory orderEntityFactory;
+
+  @Autowired
+  private OrderCancellationRepository orderCancellationRepository;
 
   public CreateOrderResponse createOrder(CreateOrderRequest orderRequest) {
     final Order order = repository.save(orderMapper.fromApi(orderRequest));
@@ -89,12 +94,29 @@ public class OrderService implements IOrderRepository {
   }
 
 
+  public void cancelOrder(Integer oid, Integer uid, String reason) {
+
+    final OrderEntity order = orderEntityFactory.build(oid);
+
+
+    if (!Objects.equals(uid, order.getOrder().getUid())) {
+      throw new RuntimeException("The user is not match, cancellation is failed.");
+    }
+
+    Message<OrderEvents> message = MessageBuilder
+        .withPayload(OrderEvents.OrderCancelled)
+        .setHeader("reason", reason)
+        .build();
+
+    order.sendEvent(message);
+  }
+
   public Order getOrderById(Integer oid) {
     Order order = repository.findOne(oid);
 
     if (Objects.nonNull(order)) {
       order.setPayment(paymentRepository.findByOid(oid));
-      order.setShipment(ShipmentRepository.findByOid(oid));
+      order.setShipment(shipmentRepository.findByOid(oid));
       order.setItems(orderItemRepository.findByOid(oid));
     }
 
@@ -117,7 +139,11 @@ public class OrderService implements IOrderRepository {
     }
 
     if (Objects.nonNull(order.getShipment())) {
-      ShipmentRepository.save(order.getShipment());
+      shipmentRepository.save(order.getShipment());
+    }
+
+    if (Objects.nonNull(order.getOrderCancellation())) {
+      orderCancellationRepository.save(order.getOrderCancellation());
     }
 
     return savedOrder;
