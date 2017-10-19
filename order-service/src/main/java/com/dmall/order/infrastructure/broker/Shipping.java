@@ -1,6 +1,5 @@
 package com.dmall.order.infrastructure.broker;
 
-import com.dmall.order.interfaces.CustomDateToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

@@ -1,4 +1,5 @@
-package com.dmall.order.domain;
+package com.dmall.order.dto;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,29 +7,31 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.math.BigDecimal;
 
 @Getter
 @Setter
-@EqualsAndHashCode
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
-@Table(name = "order_items")
 @Builder
-public class OrderItem {
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+@Slf4j
+@Entity
+@Table(name = "shipments")
+public class ShipmentDto {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;
-  private Integer pid;
+
+  private String shipping_id;
+
   private Integer oid;
-  private String name;
-  private BigDecimal price;
-  private Integer amount;
+  private String shipping_time;
+  private String received_time;
 }

@@ -1,72 +1,44 @@
-package com.dmall.order.controller;
+package com.dmall.order.api;
 
 
+import com.dmall.order.api.mapper.OrderDtoMapper;
+import com.dmall.order.api.request.CreateOrderRequest;
+import com.dmall.order.api.response.OrderResponse;
 import com.dmall.order.application.OrderService;
-import com.dmall.order.interfaces.dto.CreateOrderRequest;
-import com.dmall.order.interfaces.dto.CreateOrderResponse;
-import com.google.common.collect.Lists;
+import com.dmall.order.dto.OrderDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/")
-public class OrderController {
+public class OrderApi {
 
   @Autowired
-  // TODO: 19/10/2017 Controller uses OrderService is just a temporary design.
+  private OrderDtoMapper orderDtoMapper;
+
+  @Autowired
   private OrderService orderService;
 
   @Autowired
-  public OrderController(OrderService orderService) {
+  public OrderApi(OrderService orderService) {
     this.orderService = orderService;
   }
 
   @RequestMapping(value = "orders", method = RequestMethod.POST, headers = "Accept=application/json")
-  public CreateOrderResponse create_new_order(CreateOrderRequest request) {
-
-    orderService.createOrder(request);
-
-    CreateOrderResponse.OrderItem item = CreateOrderResponse.OrderItem.builder()
-        .pid(1)
-        .name("iPhone8")
-        .amount(1)
-        .price(BigDecimal.valueOf(8848.00))
-        .build();
-    List<CreateOrderResponse.OrderItem> orderItems = Lists.newArrayList(item);
-
-    return CreateOrderResponse.builder()
-        .oid(1)
-        .total(BigDecimal.valueOf(8848.00))
-        .create_time("2017-10-10 13:00")
-        .status("Created")
-        .items(orderItems)
-        .build();
+  public OrderResponse create_new_order(CreateOrderRequest request) {
+    final OrderDto order = orderService.createOrder(orderDtoMapper.fromApi(request));
+    return orderDtoMapper.toApi(order);
   }
 
   @RequestMapping(value = "orders/{oid}", method = RequestMethod.GET, headers = "Accept=application/json")
-  public CreateOrderResponse get_current_order(@PathVariable("oid") Integer oid) {
+  public OrderResponse get_current_order(@PathVariable("oid") Integer oid) {
+    //return orderDtoMapper.toApi(orderService.getOrderById(oid));
 
-    CreateOrderResponse.OrderItem item = CreateOrderResponse.OrderItem.builder()
-        .pid(1)
-        .name("iPhone8")
-        .amount(1)
-        .price(BigDecimal.valueOf(8848.00))
-        .build();
-    List<CreateOrderResponse.OrderItem> orderItems = Lists.newArrayList(item);
-    return CreateOrderResponse.builder()
-        .oid(1)
-        .total(BigDecimal.valueOf(8848.00))
-        .create_time("2017-10-10 13:00")
-        .status("Created")
-        .items(orderItems)
-        .build();
+    return null;
   }
 
 

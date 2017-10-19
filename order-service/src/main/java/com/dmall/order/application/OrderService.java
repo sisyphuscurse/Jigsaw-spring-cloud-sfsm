@@ -1,18 +1,17 @@
 package com.dmall.order.application;
 
+import com.dmall.order.application.mapper.OrderMapper;
 import com.dmall.order.domain.IOrderRepository;
-import com.dmall.order.domain.Order;
 import com.dmall.order.domain.OrderEntity;
 import com.dmall.order.domain.OrderEntityFactory;
 import com.dmall.order.domain.OrderEvents;
+import com.dmall.order.domain.Order;
+import com.dmall.order.dto.OrderDto;
 import com.dmall.order.infrastructure.repository.OrderCancellationRepository;
 import com.dmall.order.infrastructure.repository.OrderItemRepository;
 import com.dmall.order.infrastructure.repository.OrderRepository;
 import com.dmall.order.infrastructure.repository.PaymentRepository;
 import com.dmall.order.infrastructure.repository.ShipmentRepository;
-import com.dmall.order.interfaces.dto.CreateOrderRequest;
-import com.dmall.order.interfaces.dto.CreateOrderResponse;
-import com.dmall.order.interfaces.mapper.OrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -23,11 +22,7 @@ import java.util.Objects;
 
 @Service
 @Transactional
-// TODO: 19/10/2017 OrderService is a domain service, it implements IOrderRepository is reasonable.
 public class OrderService implements IOrderRepository {
-
-  @Autowired
-  private OrderMapper orderMapper;
 
   @Autowired
   private OrderRepository repository;
@@ -47,9 +42,11 @@ public class OrderService implements IOrderRepository {
   @Autowired
   private OrderCancellationRepository orderCancellationRepository;
 
-  public CreateOrderResponse createOrder(CreateOrderRequest orderRequest) {
-    final Order order = repository.save(orderMapper.fromApi(orderRequest));
-    return orderMapper.toApi(order);
+  @Autowired
+  private OrderMapper orderMapper;
+
+  public OrderDto createOrder(OrderDto orderDto) {
+    return save(orderDto);
   }
 
   public void notifyPaid(Integer oid, String payment_id, String payment_time) {
@@ -112,40 +109,48 @@ public class OrderService implements IOrderRepository {
   }
 
   public Order getOrderById(Integer oid) {
-    Order order = repository.findOne(oid);
+    OrderDto orderDto = repository.findOne(oid);
 
-    if (Objects.nonNull(order)) {
-      order.setPayment(paymentRepository.findByOid(oid));
-      order.setShipment(shipmentRepository.findByOid(oid));
-      order.setItems(orderItemRepository.findByOid(oid));
+    if (Objects.nonNull(orderDto)) {
+      orderDto.setPayment(paymentRepository.findByOid(oid));
+      orderDto.setShipment(shipmentRepository.findByOid(oid));
+      orderDto.setItems(orderItemRepository.findByOid(oid));
+      orderDto.setOrderCancellation(orderCancellationRepository.findByOid(oid));
     }
 
-    return order;
+    return orderMapper.fromDto(orderDto);
   }
 
   public Order save(Order order) {
 
-    Order savedOrder = repository.save(order);
+    final OrderDto orderDto = orderMapper.toDto(order);
 
-    if (Objects.nonNull(order.getItems())) {
-      order.getItems().stream()
+    return orderMapper.fromDto(save(orderDto));
+  }
+
+  private OrderDto save(OrderDto orderDto) {
+
+    OrderDto savedOrder = repository.save(orderDto);
+
+    if (Objects.nonNull(orderDto.getItems())) {
+      orderDto.getItems().stream()
           .forEach(c -> c.setOid(savedOrder.getOid()));
 
-      orderItemRepository.save(order.getItems());
+      orderItemRepository.save(orderDto.getItems());
     }
 
-    if (Objects.nonNull(order.getPayment())) {
-      paymentRepository.save(order.getPayment());
+    if (Objects.nonNull(orderDto.getPayment())) {
+      paymentRepository.save(orderDto.getPayment());
     }
 
-    if (Objects.nonNull(order.getShipment())) {
-      shipmentRepository.save(order.getShipment());
+    if (Objects.nonNull(orderDto.getShipment())) {
+      shipmentRepository.save(orderDto.getShipment());
     }
 
-    if (Objects.nonNull(order.getOrderCancellation())) {
-      orderCancellationRepository.save(order.getOrderCancellation());
+    if (Objects.nonNull(orderDto.getOrderCancellation())) {
+      orderCancellationRepository.save(orderDto.getOrderCancellation());
     }
 
-    return savedOrder;
+    return orderDto;
   }
 }

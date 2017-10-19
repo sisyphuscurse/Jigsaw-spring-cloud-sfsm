@@ -1,4 +1,4 @@
-package com.dmall.order.interfaces;
+package com.dmall.order.infrastructure.broker;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;

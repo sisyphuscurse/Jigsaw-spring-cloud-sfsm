@@ -1,4 +1,4 @@
-package com.dmall.order.domain;
+package com.dmall.order.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "order_items")
 @Builder
-public class OrderItem {
+public class OrderItemDto {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;

@@ -1,4 +1,4 @@
-package com.dmall.order.interfaces.dto;
+package com.dmall.order.api.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +16,7 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateOrderResponse {
+public class OrderResponse {
   private Integer oid;
   private Integer uid;
   private BigDecimal total;

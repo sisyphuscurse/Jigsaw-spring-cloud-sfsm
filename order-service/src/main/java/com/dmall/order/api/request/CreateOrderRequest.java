@@ -1,4 +1,4 @@
-package com.dmall.order.interfaces.dto;
+package com.dmall.order.api.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

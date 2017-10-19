@@ -23,7 +23,7 @@ Organize order process.
 ## Events emitted
 
 * **OrderCreated** - When a order is placed, in response to **OrderCreated**.
-* **OrderPaid** - When a payment has finished, in response to **OrderPaid**.
+* **OrderPaid** - When a paymentDto has finished, in response to **OrderPaid**.
 * **OrderConfirmed** - When order has confirmed, in response to **OrderConfirmed**.
 * **OrderCancelled** - When order has cancelled, in response to **OrderCancelled**.
 
