@@ -19,7 +19,7 @@ import java.util.List;
 public class OrderResponse {
   private Integer oid;
   private Integer uid;
-  private BigDecimal total;
+  private BigDecimal total_price;
   private List<OrderItem> items;
   private String create_time;
   private String status;
