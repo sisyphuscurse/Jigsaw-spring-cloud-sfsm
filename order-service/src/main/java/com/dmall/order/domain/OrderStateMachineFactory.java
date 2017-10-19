@@ -36,27 +36,27 @@ public class OrderStateMachineFactory {
           .withExternal()
           .source(OrderStates.Created).target(OrderStates.Paid)
           .event(OrderEvents.OrderPaid)
-          .action(notifyPaidAction(orderEntity), context -> orderEntity.onError(context.getException()))
+          .action(notifyPaidAction(orderEntity), handleError(orderEntity))
           .and()
           .withExternal()
           .source(OrderStates.Paid).target(OrderStates.InDelivery)
           .event(OrderEvents.OrderShipped)
-          .action(notifyShippedAction(orderEntity), context -> orderEntity.onError(context.getException()))
+          .action(notifyShippedAction(orderEntity), handleError(orderEntity))
           .and()
           .withExternal()
           .source(OrderStates.InDelivery).target(OrderStates.Received)
           .event(OrderEvents.OrderReceived)
-          .action(notifyReceivedAction(orderEntity), context -> orderEntity.onError(context.getException()))
+          .action(notifyReceivedAction(orderEntity), handleError(orderEntity))
           .and()
           .withExternal()
           .source(OrderStates.Received).target(OrderStates.Confirmed)
           .event(OrderEvents.OrderConfirmed)
-          .action(confirmOrder(orderEntity), context -> orderEntity.onError(context.getException()))
+          .action(confirmOrder(orderEntity), handleError(orderEntity))
           .and()
           .withExternal()
           .source(OrderStates.Created).target(OrderStates.Cancelled)
           .event(OrderEvents.OrderCancelled)
-          .action(cancelOrder(), context -> orderEntity.onError(context.getException()));
+          .action(cancelOrder(), handleError(orderEntity));
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -66,6 +66,10 @@ public class OrderStateMachineFactory {
     initialize(stateMachine, orderEntity);
 
     return stateMachine;
+  }
+
+  private Action<OrderStates, OrderEvents> handleError(OrderEntity orderEntity) {
+    return context -> orderEntity.onError(context.getException());
   }
 
   private void initialize(StateMachine<OrderStates, OrderEvents> stateMachine, OrderEntity entity) {
