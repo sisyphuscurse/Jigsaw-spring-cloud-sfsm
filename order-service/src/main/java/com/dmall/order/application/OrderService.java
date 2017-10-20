@@ -55,7 +55,7 @@ public class OrderService implements IOrderRepository { //TODO [Barry] Order Ser
   public OrderDTO createOrder(OrderDTO orderDTO) {
     return save(orderDTO);
   }
-  
+
   public void notifyPaid(Integer oid, String payment_id, String payment_time) {
 
     //TODO [Barry][SSM] 这是Spring FSM中显著的Boiler Plate，没有任何注释我十分不理解。

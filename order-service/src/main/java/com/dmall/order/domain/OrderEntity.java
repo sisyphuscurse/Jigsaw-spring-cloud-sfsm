@@ -8,12 +8,17 @@ import org.springframework.statemachine.StateMachine;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+//TODO [Barry] 之所以封装这个层次的领域对象，就是为了赋予Spring Injection的能力，
+// 如果他不是一个Spring Component，那么他就没有存在价值。
+// 作为聚合根，Order这个领域对象应该负责组合其他领域对象。类似的Order JPA实体也会组合其他领域对象。
 public class OrderEntity {
 
   public static final String ORDER_STATE_MACHINE = "orderStateMachine";
 
+  //TODO [Barry] 这个order应该是Order领域对象对外部隐藏的JPA Entity
   private Order order;
 
+  //TODO [Barry][SSM] 拿不掉的Boiler Plate: StateMachine
   private StateMachine<OrderStates, OrderEvents> stateMachine;
 
   private IOrderRepository repository;
@@ -30,15 +35,17 @@ public class OrderEntity {
     this.stateMachine.start();
   }
 
-
+  //TODO [Barry][SSM] 拿不掉的Boiler Plate: StateMachineId
   public String getOrderStateMachineId() {
     return ORDER_STATE_MACHINE + order.getOid();
   }
 
+  //TODO [Barry][SSM] 拿不掉的Boiler Plate: SendEvent Untyped
   public void sendEvent(Message<OrderEvents> message) {
     exceptionHandler(stateMachine.sendEvent(message));
   }
 
+  //TODO [Barry][SSM] 拿不掉的Boiler Plate: SendEvent Typed
   public void sendEvent(OrderEvents events) {
     exceptionHandler(stateMachine.sendEvent(events));
   }
