@@ -51,20 +51,30 @@ public class OrderAPI {
 
   @RequestMapping(value = "orders/{oid}/set-paid", method = RequestMethod.POST, headers = "Accept=application/json")
   public void setPaid(@PathVariable("oid") Integer oid, String payment_id, String payment_time) {
+    //TODO [Barry] notifyPaid这种命名的意图存在问题。
+    // A let B doSomething, doSomething是B的方法。通常notifyObservable是Observable的方法， 而不是Observer的方法
+    // Observer可以用update来命名。这是Observer设计模式中的标准模型。虽然setOrderPaidOnUpdate不是个好的命名方法，
+    // 但能更正确体现出"交互"关系，或者请大牛们给出更好的名字。OrderService本身不是Observable，也没有notify能力。
+    // 在OO设计中这种命名问题非常普遍，特此讨论。
+
     orderService.notifyPaid(oid, payment_id, payment_time);
   }
 
   @RequestMapping(value = "/orders/{oid}/deliver", method = RequestMethod.POST, headers = "Accept=application/json")
   public void deliver(@PathVariable("oid") Integer oid, String shipping_id, String shipments_time) {
+    //TODO [Barry] 同上
     orderService.notifyInDelivery(oid, shipping_id, shipments_time);
   }
 
   @RequestMapping(value = "/orders/{oid}/set-received", method = RequestMethod.POST, headers = "Accept=application/json")
   public void receive(@PathVariable("oid") Integer oid, Integer shipping_id, String receive_time) {
+    //TODO [Barry] 同上
     orderService.notifyReceived(oid, shipping_id, receive_time);
   }
 
   @RequestMapping(value = "/orders/{oid}/confirm", method = RequestMethod.POST, headers = "Accept=application/json")
+  //TODO [Barry] 截至目前，除了create_new_order不合适的打破了封装多了一个orderDtoMapper.fromApi(request)操作，其余所有方法
+  // 都只有一行直接对OrderService裸调。基本上这个类是多余的BoilerPlate。
   public void confirm(@PathVariable("oid") Integer oid, String uid) {
     orderService.confirmOrder(oid, uid);
   }
