@@ -6,6 +6,7 @@ import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Component;
 
 @Component
+//TODO [Barry][SSM] 这也是因为Spring FSM带来的Boiler Plate，当中没有任何领域逻辑，没有任何状态机本身的信息
 public class OrderEntityFactory {
 
   @Autowired
