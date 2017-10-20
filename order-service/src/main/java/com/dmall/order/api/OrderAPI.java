@@ -15,9 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/")
+//TODO [Barry] 是否可以把API这一层去掉，直接利用OrderService + Order Service依赖的Value Classes和HTTP直接建立对应关系
+//TODO [Barry] 关于HTTP与Service的绑定关系，如果能保持一致，不会有额外的变化因素导致HTTP层次与Service层次各自修改范围不同，那么我认为没必要独立分层。
 public class OrderAPI {
 
   @Autowired
+  //TODO [Barry] 一致地，如果OrderService本身能做能接口定义（或者单独一个OrderService interface)，那么这个角色也可以省略
   private OrderDtoMapper orderDtoMapper;
 
   @Autowired
@@ -30,6 +33,10 @@ public class OrderAPI {
 
   @RequestMapping(value = "orders", method = RequestMethod.POST, headers = "Accept=application/json")
   public OrderResponse create_new_order(CreateOrderRequest request) {
+    //TODO [Barry] CreateOrderRequest是OrderService.createOrder的直接参数，不需要额外转换。另外Order JPA Entity对象不需要在Service层面暴漏出来。
+    // 结合上边立论，OrderService.createOrder方法可以直接以CreateOrderRequest作为参数。Order JPA Entity在上下游传来传去是很方便，但是打破了封装，
+    // 如果api层次的mapper给Order JPA Entity设置了不合适的业务属性（比如状态），那么就打破了业务规则，
+    // 所以Order JPA Entity的构建应该在领域服务Order Service内部构建。至于能不能直接作为Service的Response给出去，这个看情况。
     final OrderDTO order = orderService.createOrder(orderDtoMapper.fromApi(request));
     return orderDtoMapper.toApi(order);
   }
