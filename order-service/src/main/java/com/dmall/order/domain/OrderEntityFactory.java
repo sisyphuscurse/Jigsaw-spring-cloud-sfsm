@@ -1,8 +1,12 @@
 package com.dmall.order.domain;
 
 
+import com.dmall.order.infrastructure.repository.OrderCancellationRepository;
+import com.dmall.order.infrastructure.repository.OrderItemRepository;
+import com.dmall.order.infrastructure.repository.OrderRepository;
+import com.dmall.order.infrastructure.repository.PaymentRepository;
+import com.dmall.order.infrastructure.repository.ShipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,18 +18,27 @@ public class OrderEntityFactory {
   private OrderStateMachineFactory orderStateMachineFactory;
 
   @Autowired
-  private IOrderRepository repository;
+  private OrderRepository repository;
 
+  @Autowired
+  private OrderItemRepository orderItemRepository;
+
+  @Autowired
+  private PaymentRepository paymentRepository;
+
+  @Autowired
+  private ShipmentRepository shipmentRepository;
+
+  @Autowired
+  private OrderCancellationRepository orderCancellationRepository;
 
   public OrderEntity build(Integer oid) {
-    final Order order = repository.getOrderById(oid);
+    return new OrderEntity(oid, orderStateMachineFactory, repository, orderItemRepository, paymentRepository,
+        shipmentRepository, orderCancellationRepository);
+  }
 
-    final OrderEntity orderEntity = new OrderEntity(order, repository);
-
-    final StateMachine<OrderStates, OrderEvents> stateMachine = orderStateMachineFactory.build(orderEntity);
-
-    orderEntity.initialize(stateMachine);
-
-    return orderEntity;
+  public OrderEntity build(Order order) {
+    return new OrderEntity(order, orderStateMachineFactory, repository, orderItemRepository, paymentRepository,
+        shipmentRepository, orderCancellationRepository);
   }
 }

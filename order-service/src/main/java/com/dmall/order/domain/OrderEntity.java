@@ -2,15 +2,20 @@
 package com.dmall.order.domain;
 
 
+import com.dmall.order.infrastructure.repository.OrderCancellationRepository;
+import com.dmall.order.infrastructure.repository.OrderItemRepository;
+import com.dmall.order.infrastructure.repository.OrderRepository;
+import com.dmall.order.infrastructure.repository.PaymentRepository;
+import com.dmall.order.infrastructure.repository.ShipmentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
-//TODO [Barry] 之所以封装这个层次的领域对象，就是为了赋予Spring Injection的能力，
-// 如果他不是一个Spring Component，那么他就没有存在价值。
-// 作为聚合根，Order这个领域对象应该负责组合其他领域对象。类似的Order JPA实体也会组合其他领域对象。
 public class OrderEntity {
 
   public static final String ORDER_STATE_MACHINE = "orderStateMachine";
@@ -21,17 +26,39 @@ public class OrderEntity {
   //TODO [Barry][SSM] 拿不掉的Boiler Plate: StateMachine
   private StateMachine<OrderStates, OrderEvents> stateMachine;
 
-  private IOrderRepository repository;
   private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
-  public OrderEntity(Order order, IOrderRepository repository) {
+  private OrderRepository repository;
+
+  private OrderItemRepository orderItemRepository;
+
+  private PaymentRepository paymentRepository;
+
+  private ShipmentRepository shipmentRepository;
+
+  private OrderCancellationRepository orderCancellationRepository;
+
+  public OrderEntity(Order order, OrderStateMachineFactory stateMachineFactory, OrderRepository repository, OrderItemRepository orderItemRepository, PaymentRepository paymentRepository, ShipmentRepository shipmentRepository, OrderCancellationRepository orderCancellationRepository) {
     this.order = order;
     this.repository = repository;
+    this.orderItemRepository = orderItemRepository;
+    this.paymentRepository = paymentRepository;
+    this.shipmentRepository = shipmentRepository;
+    this.orderCancellationRepository = orderCancellationRepository;
+
+    this.stateMachine = stateMachineFactory.build(this);
+    this.stateMachine.start();
   }
 
-  // TODO: 18/10/2017 [BOILDER PLATE] This method should be refectory
-  public void initialize(StateMachine<OrderStates, OrderEvents> stateMachine) {
-    this.stateMachine = stateMachine;
+  public OrderEntity(Integer oid, OrderStateMachineFactory stateMachineFactory, OrderRepository repository, OrderItemRepository orderItemRepository, PaymentRepository paymentRepository, ShipmentRepository shipmentRepository, OrderCancellationRepository orderCancellationRepository) {
+    this.repository = repository;
+    this.orderItemRepository = orderItemRepository;
+    this.paymentRepository = paymentRepository;
+    this.shipmentRepository = shipmentRepository;
+    this.orderCancellationRepository = orderCancellationRepository;
+
+    this.order = getOrderById(oid);
+    this.stateMachine = stateMachineFactory.build(this);
     this.stateMachine.start();
   }
 
@@ -82,7 +109,7 @@ public class OrderEntity {
 
   void onStateChanged() {
     order.setState(stateMachine.getState().getId());
-    repository.save(order);
+    save();
   }
 
   void onError(Exception exception) {
@@ -106,6 +133,45 @@ public class OrderEntity {
   }
 
   public Order getOrder() {
+    return order;
+  }
+
+  public Order save() {
+
+    repository.save(order);
+
+    if (Objects.nonNull(order.getItems())) {
+      order.getItems().stream()
+          .forEach(c -> c.setOid(order.getOid()));
+
+      orderItemRepository.save(order.getItems());
+    }
+
+    if (Objects.nonNull(order.getPayment())) {
+      paymentRepository.save(order.getPayment());
+    }
+
+    if (Objects.nonNull(order.getShipment())) {
+      shipmentRepository.save(order.getShipment());
+    }
+
+    if (Objects.nonNull(order.getOrderCancellation())) {
+      orderCancellationRepository.save(order.getOrderCancellation());
+    }
+
+    return order;
+  }
+
+  private Order getOrderById(Integer oid) {
+    Order order = repository.findOne(oid);
+
+    if (Objects.nonNull(order)) {
+      order.setPayment(paymentRepository.findByOid(oid));
+      order.setShipment(shipmentRepository.findByOid(oid));
+      order.setItems(orderItemRepository.findByOid(oid));
+      order.setOrderCancellation(orderCancellationRepository.findByOid(oid));
+    }
+
     return order;
   }
 }

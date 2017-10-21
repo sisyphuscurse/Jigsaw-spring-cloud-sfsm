@@ -19,11 +19,7 @@ import javax.persistence.Table;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "order_cancellation")
 public class OrderCancellationDTO {
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;
   private Integer oid;
   private String created_time;

@@ -7,6 +7,7 @@ import com.dmall.order.api.response.OrderResponse;
 import com.dmall.order.application.OrderService;
 import com.dmall.order.dto.OrderDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
+@Scope(scopeName = "")
 @RequestMapping("/")
 //TODO [Barry] 是否可以把API这一层去掉，直接利用OrderService + Order Service依赖的Value Classes和HTTP直接建立对应关系
 //TODO [Barry] 关于HTTP与Service的绑定关系，如果能保持一致，不会有额外的变化因素导致HTTP层次与Service层次各自修改范围不同，那么我认为没必要独立分层。

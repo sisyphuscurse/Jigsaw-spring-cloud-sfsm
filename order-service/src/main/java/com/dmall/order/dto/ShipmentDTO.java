@@ -21,12 +21,7 @@ import javax.persistence.Table;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-@Slf4j
-@Entity
-@Table(name = "shipments")
 public class ShipmentDTO {
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;
 
   private String shipping_id;

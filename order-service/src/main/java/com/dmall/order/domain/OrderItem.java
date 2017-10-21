@@ -19,8 +19,12 @@ import java.math.BigDecimal;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
+@Table(name = "order_items")
 @Builder
 public class OrderItem {
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;
   private Integer pid;
   private Integer oid;

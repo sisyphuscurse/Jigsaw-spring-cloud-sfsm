@@ -24,43 +24,29 @@ import java.util.List;
 
 @Getter
 @Setter
-@Entity
 @Builder
 @AllArgsConstructor
-@Table(name = "orders")
 public class OrderDTO {
 
-  public static final String ORDER_STATE_MACHINE = "orderStateMachine";
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer oid;
 
-  @Column(nullable = false)
   private Integer uid;
 
-  @Column(nullable = false)
   private BigDecimal total_price;
 
-  @Column(nullable = false)
   private String create_time;
 
-  @Enumerated(EnumType.STRING)
   private OrderStates state;
 
-  @Column(nullable = false)
   private String confirm_time;
 
-  @Transient
   private OrderCancellationDTO orderCancellation;
 
-  @Transient
   private List<OrderItemDTO> items;
 
-  @Transient
   private PaymentDTO payment;
 
-  @Transient
   private ShipmentDTO shipment;
 
   public OrderDTO() {

@@ -20,10 +20,17 @@ import javax.persistence.Table;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
+@Entity
+@Table(name = "payments")
 public class Payment {
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;
+
   private String payment_id;
+
   private Integer oid;
   private String payment_time;
 }
