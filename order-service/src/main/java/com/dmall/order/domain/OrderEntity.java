@@ -45,6 +45,7 @@ public class OrderEntity {
     this.shipmentRepository = shipmentRepository;
     this.orderCancellationRepository = orderCancellationRepository;
 
+    this.save();
     this.stateMachine = stateMachineFactory.build(this);
     this.stateMachine.start();
   }
