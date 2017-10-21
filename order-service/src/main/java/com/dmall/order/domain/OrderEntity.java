@@ -20,7 +20,6 @@ public class OrderEntity {
 
   public static final String ORDER_STATE_MACHINE = "orderStateMachine";
 
-  //TODO [Barry] 这个order应该是Order领域对象对外部隐藏的JPA Entity
   private Order order;
 
   //TODO [Barry][SSM] 拿不掉的Boiler Plate: StateMachine
